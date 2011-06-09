@@ -1,0 +1,71 @@
+#!/usr/bin/perl
+
+# workaround for dzil
+package list_org_anniversaries;
+BEGIN {
+  $list_org_anniversaries::VERSION = '0.02';
+}
+# ABSTRACT: List anniversaries in Org files
+
+use 5.010;
+use strict;
+use warnings;
+
+use Sub::Spec::CmdLine qw(run);
+
+run(module => 'App::ListOrgAnniversaries', sub=>'list_org_anniversaries');
+
+
+
+=pod
+
+=head1 NAME
+
+list_org_anniversaries - List anniversaries in Org files
+
+=head1 VERSION
+
+version 0.02
+
+=head1 SYNOPSIS
+
+ # list all anniversaries
+ $ list-org-anniversaries ~/addressbook.org
+
+ # only show friends' birthdays due in 1 week and not past 1 week overdue
+ $ list-org-anniversaries --field-pattern 'birthday' --has-tags '[friend]' \
+     --due-in 7 --max-overdue 7 --nopretty ~/contacts-*.org
+
+prints something like:
+
+ in 3 days: 1st WEDDING_ANNIVERSARY of Cinta Cemara (2010-07-04 - 2011-07-04)
+ 1 day ago: birthday of Cinta Cemara (2010-06-30)
+
+=head1 DESCRIPTION
+
+This script
+
+See L<App::ListOrgAnniversaries> for details on expected , including available options.
+
+=head1 SEE ALSO
+
+L<Org::Parser>
+
+B<org-contacts>
+
+=head1 AUTHOR
+
+Steven Haryanto <stevenharyanto@gmail.com>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2011 by Steven Haryanto.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut
+
+
+__END__
+

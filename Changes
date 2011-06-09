@@ -1,0 +1,14 @@
+Revision history for App-OrgUtils
+
+0.02    2011-06-09
+
+        * Rename distribution from App-ListOrgHeadlines to App-OrgUtils.
+
+        * Move script from Org::Parser: dump-org-structure.
+
+        * Add scripts: list-org-anniversaries.
+
+
+0.01    2011-06-06
+
+        First release, spun off from Org::Parser's sample script.

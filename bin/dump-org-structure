@@ -1,0 +1,66 @@
+#!/usr/bin/perl
+
+# workaround for dzil
+package dump_org_structure;
+BEGIN {
+  $dump_org_structure::VERSION = '0.02';
+}
+# ABSTRACT: Dump Org document structure
+
+use 5.010;
+use strict;
+use warnings;
+use Log::Any qw($log);
+
+use String::Escape qw(elide printable);
+use Org::Parser;
+use Org::Dump;
+
+binmode STDIN, ":utf8";
+binmode STDOUT, ":utf8";
+
+my $input = [<>];
+close ARGV; # so perl doesn't add ", <> line xx" upon dying
+
+my $doc = Org::Parser->new->parse($input);
+print Org::Dump::dump_element($doc);
+
+
+__END__
+=pod
+
+=head1 NAME
+
+dump_org_structure - Dump Org document structure
+
+=head1 VERSION
+
+version 0.02
+
+=head1 SYNOPSIS
+
+ $ dump-org-structure   foo.org
+ $ dump-org-structure < bar.org
+
+=head1 DESCRIPTION
+
+This script parse input using L<Org::Parser> and dump the structure in an
+outline format. This script is mostly used for debugging.
+
+=head1 SEE ALSO
+
+L<Org::Parser>
+
+=head1 AUTHOR
+
+Steven Haryanto <stevenharyanto@gmail.com>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2011 by Steven Haryanto.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut
+

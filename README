@@ -1,0 +1,22 @@
+NAME
+    App::OrgUtils - Some utilities for Org documents
+
+VERSION
+    version 0.02
+
+DESCRIPTION
+    This distribution includes a few modules (scripts) for dealing with Org
+    documents; some originally created as examples/demos for Org::Parser.
+
+SEE ALSO
+    Org::Parser
+
+AUTHOR
+    Steven Haryanto <stevenharyanto@gmail.com>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2011 by Steven Haryanto.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+
