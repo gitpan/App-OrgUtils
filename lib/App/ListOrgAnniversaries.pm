@@ -1,6 +1,6 @@
 package App::ListOrgAnniversaries;
 BEGIN {
-  $App::ListOrgAnniversaries::VERSION = '0.02';
+  $App::ListOrgAnniversaries::VERSION = '0.03';
 }
 #ABSTRACT: List headlines in Org files
 
@@ -50,7 +50,8 @@ sub _process_hl {
 
             if ($el->isa('Org::Element::Timestamp')) {
                 my $field = $el->field_name;
-                next unless defined($field) && $field =~ $args->{field_pattern};
+                return unless defined($field) &&
+                    $field =~ $args->{field_pattern};
                 push @annivs, [$field, $el->datetime];
                 return;
             }
@@ -139,12 +140,10 @@ ignored).
 
 By convention, if year is '1900' it is assumed to mean year is not specified.
 
-By default, anniversaries that are due in 2 weeks or overdue not longer than 2
-days are displayed. This can be changed using 'due_in' and 'max_overdue'
-options.
-
 By default, all contacts' anniversaries will be listed. You can filter contacts
-using tags ('has_tags' and 'lack_tags' options).
+using tags ('has_tags' and 'lack_tags' options), or by 'due_in' and
+'max_overdue' options (due_in=14 and max_overdue=2 is what I commonly use in my
+startup script).
 
 _
     args    => {
@@ -214,7 +213,7 @@ App::ListOrgAnniversaries - List headlines in Org files
 
 =head1 VERSION
 
-version 0.02
+version 0.03
 
 =head1 SYNOPSIS
 
@@ -227,6 +226,71 @@ This module uses L<Log::Any> logging framework.
 =head1 FUNCTIONS
 
 None are exported, but they are exportable.
+
+=head2 list_org_anniversaries(%args) -> [STATUS_CODE, ERR_MSG, RESULT]
+
+
+List all anniversaries in Org files.
+
+This function expects contacts in the following format:
+
+ * First last                              :office:friend:
+   :PROPERTIES:
+   :BIRTHDAY:     1900-06-07
+   :EMAIL:        foo@example.com
+   :OTHERFIELD:   ...
+   :END:
+
+or:
+
+ * Some name                               :office:
+   - birthday   :: [1900-06-07 ]
+   - email      :: foo@example.com
+   - otherfield :: ...
+
+Using PROPERTIES, dates currently must be specified in "YYYY-MM-DD" format.
+Other format will be supported in the future. Using description list, dates can
+be specified using normal Org timestamps (repeaters and warning periods will be
+ignored).
+
+By convention, if year is '1900' it is assumed to mean year is not specified.
+
+By default, all contacts' anniversaries will be listed. You can filter contacts
+using tags ('has_tags' and 'lack_tags' options), or by 'due_in' and
+'max_overdue' options (due_in=14 and max_overdue=2 is what I commonly use in my
+startup script).
+
+Returns a 3-element arrayref. STATUS_CODE is 200 on success, or an error code
+between 3xx-5xx (just like in HTTP). ERR_MSG is a string containing error
+message, RESULT is the actual result.
+
+Arguments (C<*> denotes required arguments):
+
+=over 4
+
+=item * B<files>* => I<array>
+
+=item * B<due_in> => I<int>
+
+Only show anniversaries that are due in this number of days.
+
+=item * B<field_pattern> => I<str> (default C<"(?:birthday|anniversary)">)
+
+Field regex that specifies anniversaries.
+
+=item * B<has_tags> => I<array>
+
+Filter headlines that have the specified tags.
+
+=item * B<lack_tags> => I<array>
+
+Filter headlines that don't have the specified tags.
+
+=item * B<max_overdue> => I<int>
+
+Don't show dates that are overdue more than this number of days.
+
+=back
 
 =head1 AUTHOR
 

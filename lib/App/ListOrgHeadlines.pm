@@ -1,6 +1,6 @@
 package App::ListOrgHeadlines;
 BEGIN {
-  $App::ListOrgHeadlines::VERSION = '0.02';
+  $App::ListOrgHeadlines::VERSION = '0.03';
 }
 #ABSTRACT: List headlines in Org files
 
@@ -172,7 +172,7 @@ App::ListOrgHeadlines - List headlines in Org files
 
 =head1 VERSION
 
-version 0.02
+version 0.03
 
 =head1 SYNOPSIS
 
@@ -183,6 +183,63 @@ version 0.02
 =head1 FUNCTIONS
 
 None are exported, but they are exportable.
+
+=head2 list_org_headlines(%args) -> [STATUS_CODE, ERR_MSG, RESULT]
+
+
+List all headlines in all Org files.
+
+Returns a 3-element arrayref. STATUS_CODE is 200 on success, or an error code
+between 3xx-5xx (just like in HTTP). ERR_MSG is a string containing error
+message, RESULT is the actual result.
+
+Arguments (C<*> denotes required arguments):
+
+=over 4
+
+=item * B<files>* => I<array>
+
+=item * B<detail> => I<bool> (default C<0>)
+
+Show details instead of just titles.
+
+=item * B<done> => I<bool>
+
+Filter todo items that are done.
+
+=item * B<due_in> => I<int>
+
+Filter todo items which is due in this number of days.
+
+=item * B<from_level> => I<int> (default C<1>)
+
+Filter headlines having this level as the minimum.
+
+=item * B<has_tags> => I<array>
+
+Filter headlines that have the specified tags.
+
+=item * B<lack_tags> => I<array>
+
+Filter headlines that don't have the specified tags.
+
+=item * B<priority> => I<str>
+
+Filter todo items that have this priority.
+
+=item * B<state> => I<str>
+
+Filter todo items that have this state.
+
+=item * B<to_level> => I<int>
+
+Filter headlines having this level as the maximum.
+
+=item * B<todo> => I<bool> (default C<0>)
+
+Filter headlines that are todos.
+
+=back
 
 =head1 AUTHOR
 
