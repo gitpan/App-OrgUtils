@@ -3,7 +3,7 @@
 # workaround for dzil
 package list_org_anniversaries;
 BEGIN {
-  $list_org_anniversaries::VERSION = '0.03';
+  $list_org_anniversaries::VERSION = '0.04';
 }
 # ABSTRACT: List anniversaries in Org files
 
@@ -25,7 +25,7 @@ list_org_anniversaries - List anniversaries in Org files
 
 =head1 VERSION
 
-version 0.03
+version 0.04
 
 =head1 SYNOPSIS
 

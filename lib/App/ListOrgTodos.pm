@@ -1,6 +1,6 @@
 package App::ListOrgTodos;
 BEGIN {
-  $App::ListOrgTodos::VERSION = '0.03';
+  $App::ListOrgTodos::VERSION = '0.04';
 }
 #ABSTRACT: List todo items in Org files
 
@@ -44,7 +44,7 @@ App::ListOrgTodos - List todo items in Org files
 
 =head1 VERSION
 
-version 0.03
+version 0.04
 
 =head1 SYNOPSIS
 

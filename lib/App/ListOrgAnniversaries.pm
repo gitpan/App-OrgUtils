@@ -1,6 +1,6 @@
 package App::ListOrgAnniversaries;
 BEGIN {
-  $App::ListOrgAnniversaries::VERSION = '0.03';
+  $App::ListOrgAnniversaries::VERSION = '0.04';
 }
 #ABSTRACT: List headlines in Org files
 
@@ -213,7 +213,7 @@ App::ListOrgAnniversaries - List headlines in Org files
 
 =head1 VERSION
 
-version 0.03
+version 0.04
 
 =head1 SYNOPSIS
 

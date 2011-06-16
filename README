@@ -2,7 +2,7 @@ NAME
     App::OrgUtils - Some utilities for Org documents
 
 VERSION
-    version 0.03
+    version 0.04
 
 DESCRIPTION
     This distribution includes a few modules (scripts) for dealing with Org

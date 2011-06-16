@@ -1,6 +1,6 @@
 package App::OrgUtils;
 BEGIN {
-  $App::OrgUtils::VERSION = '0.03';
+  $App::OrgUtils::VERSION = '0.04';
 }
 #ABSTRACT: Some utilities for Org documents
 
@@ -19,7 +19,7 @@ App::OrgUtils - Some utilities for Org documents
 
 =head1 VERSION
 
-version 0.03
+version 0.04
 
 =head1 DESCRIPTION
 

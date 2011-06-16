@@ -3,24 +3,22 @@
 # workaround for dzil
 package dump_org_structure;
 BEGIN {
-  $dump_org_structure::VERSION = '0.03';
+  $dump_org_structure::VERSION = '0.04';
 }
 # ABSTRACT: Dump Org document structure
 
 use 5.010;
 use strict;
 use warnings;
+use open qw(:std :utf8);
 use Log::Any qw($log);
 
 use String::Escape qw(elide printable);
 use Org::Parser;
 use Org::Dump;
 
-binmode STDIN, ":utf8";
-binmode STDOUT, ":utf8";
-
 my $input = [<>];
-close ARGV; # so perl doesn't add ", <> line xx" upon dying
+close STDIN; close ARGV; # so perl doesn't add ", <> line xx" upon dying
 
 my $doc = Org::Parser->new->parse($input);
 print Org::Dump::dump_element($doc);
@@ -35,7 +33,7 @@ dump_org_structure - Dump Org document structure
 
 =head1 VERSION
 
-version 0.03
+version 0.04
 
 =head1 SYNOPSIS
 

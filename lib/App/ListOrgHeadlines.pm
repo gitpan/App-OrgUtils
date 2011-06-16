@@ -1,6 +1,6 @@
 package App::ListOrgHeadlines;
 BEGIN {
-  $App::ListOrgHeadlines::VERSION = '0.03';
+  $App::ListOrgHeadlines::VERSION = '0.04';
 }
 #ABSTRACT: List headlines in Org files
 
@@ -172,7 +172,7 @@ App::ListOrgHeadlines - List headlines in Org files
 
 =head1 VERSION
 
-version 0.03
+version 0.04
 
 =head1 SYNOPSIS
 

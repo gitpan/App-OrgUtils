@@ -15,11 +15,11 @@ meta-spec:
 name: App-OrgUtils
 requires:
   Lingua::EN::Numbers::Ordinate: 0
-  Org::Parser: 0.15
+  Org::Parser: 0.16
   Sub::Spec::CmdLine: 0.30
   Test::More: 0.96
   perl: 5.010000
 resources:
   homepage: http://search.cpan.org/dist/App-OrgUtils/
   repository: http://github.com/sharyanto/perl-App-OrgUtils
-version: 0.03
+version: 0.04
