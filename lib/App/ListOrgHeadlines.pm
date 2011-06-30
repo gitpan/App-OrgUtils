@@ -1,6 +1,6 @@
 package App::ListOrgHeadlines;
 BEGIN {
-  $App::ListOrgHeadlines::VERSION = '0.04';
+  $App::ListOrgHeadlines::VERSION = '0.05';
 }
 #ABSTRACT: List headlines in Org files
 
@@ -60,7 +60,30 @@ sub _process_hl {
         if $ats;
     if (defined $args->{due_in}) {
         return unless $ats;
-        return unless $days <= $args->{due_in};
+        my $met = $days <= $args->{due_in};
+        if (!$met && $ats->_warning_period) {
+            # try the warning period
+            my $dt = $ats->datetime->clone;
+            my $wp = $ats->_warning_period;
+            $wp =~ s/(\w)$//;
+            my $unit = $1;
+            $wp = abs($wp);
+            if ($unit eq 'd') {
+                $dt->subtract(days => $wp);
+            } elsif ($unit eq 'w') {
+                $dt->subtract(weeks => $wp);
+            } elsif ($unit eq 'm') {
+                $dt->subtract(months => $wp);
+            } elsif ($unit eq 'y') {
+                $dt->subtract(years => $wp);
+            } else {
+                die "Can't understand unit '$unit' in timestamp's ".
+                    "warning period: " . $ats->as_string;
+                return;
+            }
+            $met++ if DateTime->compare($dt, $today) <= 0;
+        }
+        return unless $met;
     }
 
     my $r;
@@ -109,6 +132,15 @@ $SPEC{list_org_headlines} = {
         }],
         due_in => [int => {
             summary => 'Filter todo items which is due in this number of days',
+            description => <<'_',
+
+Note that if the todo's due date has warning period and the warning period is
+active, then it will also pass this filter irregardless. Example, if today is
+2011-06-30 and due_in is set to 7, then todo with due date <2011-07-10 > won't
+pass the filter but <2011-07-10 Sun +1y -14d> will (warning period 14 days is
+already active by that time).
+
+_
         }],
         from_level => [int => {
             summary => 'Filter headlines having this level as the minimum',
@@ -172,7 +204,7 @@ App::ListOrgHeadlines - List headlines in Org files
 
 =head1 VERSION
 
-version 0.04
+version 0.05
 
 =head1 SYNOPSIS
 
@@ -210,6 +242,12 @@ Filter todo items that are done.
 =item * B<due_in> => I<int>
 
 Filter todo items which is due in this number of days.
+
+Note that if the todo's due date has warning period and the warning period is
+active, then it will also pass this filter irregardless. Example, if today is
+2011-06-30 and due_in is set to 7, then todo with due date <2011-07-10 > won't
+pass the filter but <2011-07-10 Sun +1y -14d> will (warning period 14 days is
+already active by that time).
 
 =item * B<from_level> => I<int> (default C<1>)
 

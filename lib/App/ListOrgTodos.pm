@@ -1,6 +1,6 @@
 package App::ListOrgTodos;
 BEGIN {
-  $App::ListOrgTodos::VERSION = '0.04';
+  $App::ListOrgTodos::VERSION = '0.05';
 }
 #ABSTRACT: List todo items in Org files
 
@@ -44,7 +44,7 @@ App::ListOrgTodos - List todo items in Org files
 
 =head1 VERSION
 
-version 0.04
+version 0.05
 
 =head1 SYNOPSIS
 
@@ -82,6 +82,12 @@ Filter todo items that are done.
 =item * B<due_in> => I<int>
 
 Filter todo items which is due in this number of days.
+
+Note that if the todo's due date has warning period and the warning period is
+active, then it will also pass this filter irregardless. Example, if today is
+2011-06-30 and due_in is set to 7, then todo with due date <2011-07-10 > won't
+pass the filter but <2011-07-10 Sun +1y -14d> will (warning period 14 days is
+already active by that time).
 
 =item * B<from_level> => I<int> (default C<1>)
 
