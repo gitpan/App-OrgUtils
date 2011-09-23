@@ -1,8 +1,4 @@
 package App::ListOrgTodos;
-BEGIN {
-  $App::ListOrgTodos::VERSION = '0.05';
-}
-#ABSTRACT: List todo items in Org files
 
 use 5.010;
 use strict;
@@ -17,6 +13,8 @@ use Org::Parser;
 require Exporter;
 our @ISA       = qw(Exporter);
 our @EXPORT_OK = qw(list_org_todos);
+
+our $VERSION = '0.06'; # VERSION
 
 our %SPEC;
 
@@ -34,6 +32,7 @@ sub list_org_todos {
 }
 
 1;
+#ABSTRACT: List todo items in Org files
 
 
 =pod
@@ -44,7 +43,7 @@ App::ListOrgTodos - List todo items in Org files
 
 =head1 VERSION
 
-version 0.05
+version 0.06
 
 =head1 SYNOPSIS
 
@@ -108,6 +107,12 @@ Filter todo items that have this priority.
 =item * B<state> => I<str>
 
 Filter todo items that have this state.
+
+=item * B<time_zone> => I<str>
+
+Will be passed to parser's options.
+
+If not set, TZ environment variable will be picked as default.
 
 =item * B<to_level> => I<int>
 

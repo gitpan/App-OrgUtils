@@ -2,9 +2,6 @@
 
 # workaround for dzil
 package list_org_headlines;
-BEGIN {
-  $list_org_headlines::VERSION = '0.05';
-}
 # ABSTRACT: List headlines in Org files
 
 use 5.010;
@@ -25,7 +22,7 @@ list_org_headlines - List headlines in Org files
 
 =head1 VERSION
 
-version 0.05
+version 0.06
 
 =head1 SYNOPSIS
 

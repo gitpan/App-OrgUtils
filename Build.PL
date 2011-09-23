@@ -17,14 +17,14 @@ my %module_build_args = (
     'Steven Haryanto <stevenharyanto@gmail.com>'
   ],
   'dist_name' => 'App-OrgUtils',
-  'dist_version' => '0.05',
+  'dist_version' => '0.06',
   'license' => 'perl',
   'module_name' => 'App::OrgUtils',
   'recommends' => {},
   'recursive_test_files' => 1,
   'requires' => {
     'Lingua::EN::Numbers::Ordinate' => '0',
-    'Org::Parser' => '0.16',
+    'Org::Parser' => '0.20',
     'Sub::Spec::CmdLine' => '0.30',
     'Test::More' => '0.96',
     'perl' => '5.010000'

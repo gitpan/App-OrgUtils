@@ -1,8 +1,4 @@
 package App::ListOrgHeadlines;
-BEGIN {
-  $App::ListOrgHeadlines::VERSION = '0.05';
-}
-#ABSTRACT: List headlines in Org files
 
 use 5.010;
 use strict;
@@ -16,13 +12,15 @@ require Exporter;
 our @ISA       = qw(Exporter);
 our @EXPORT_OK = qw(list_org_headlines);
 
+our $VERSION = '0.06'; # VERSION
+
 our %SPEC;
 
 my $today;
 my $yest;
 
 sub _process_hl {
-    my ($file, $hl, $args, $res) = @_;
+    my ($file, $hl, $args, $res, $opts) = @_;
 
     return if $args->{from_level} && $hl->level < $args->{from_level};
     return if $args->{to_level}   && $hl->level > $args->{to_level};
@@ -165,15 +163,25 @@ _
         priority => [str => {
             summary => 'Filter todo items that have this priority',
         }],
+        time_zone => [str => {
+            summary => 'Will be passed to parser\'s options',
+            description => <<'_',
+
+If not set, TZ environment variable will be picked as default.
+
+_
+        }],
     },
 };
 sub list_org_headlines {
     my %args = @_;
 
+    my $tz = $args{time_zone} // $ENV{TZ};
+
     my $files = $args{files};
     return [400, "Please specify files"] if !$files || !@$files;
 
-    $today = DateTime->today;
+    $today = DateTime->today(time_zone => $tz);
     $yest  = $today->clone->add(days => -1);
 
     my $orgp = Org::Parser->new;
@@ -181,12 +189,13 @@ sub list_org_headlines {
 
     for my $file (@$files) {
         $log->debug("Parsing $file ...");
-        my $doc = $orgp->parse_file($file);
+        my $opts = {time_zone => $tz};
+        my $doc = $orgp->parse_file($file, $opts);
         $doc->walk(
             sub {
                 my ($el) = @_;
                 return unless $el->isa('Org::Element::Headline');
-                _process_hl($file, $el, \%args, \@res)
+                _process_hl($file, $el, \%args, \@res, $opts)
             });
     } # for $file
 
@@ -194,6 +203,7 @@ sub list_org_headlines {
 }
 
 1;
+#ABSTRACT: List headlines in Org files
 
 
 =pod
@@ -204,7 +214,7 @@ App::ListOrgHeadlines - List headlines in Org files
 
 =head1 VERSION
 
-version 0.05
+version 0.06
 
 =head1 SYNOPSIS
 
@@ -268,6 +278,12 @@ Filter todo items that have this priority.
 =item * B<state> => I<str>
 
 Filter todo items that have this state.
+
+=item * B<time_zone> => I<str>
+
+Will be passed to parser's options.
+
+If not set, TZ environment variable will be picked as default.
 
 =item * B<to_level> => I<int>
 
