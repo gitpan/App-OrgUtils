@@ -17,7 +17,7 @@ my %module_build_args = (
     'Steven Haryanto <stevenharyanto@gmail.com>'
   ],
   'dist_name' => 'App-OrgUtils',
-  'dist_version' => '0.06',
+  'dist_version' => '0.07',
   'license' => 'perl',
   'module_name' => 'App::OrgUtils',
   'recommends' => {},
