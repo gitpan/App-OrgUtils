@@ -2,7 +2,6 @@
 
 # workaround for dzil
 package list_org_todos;
-# ABSTRACT: List todo items in Org files
 
 use 5.010;
 use strict;
@@ -10,10 +9,15 @@ use warnings;
 
 use Sub::Spec::CmdLine qw(run);
 
+our $VERSION = '0.08'; # VERSION
+
 run(module => 'App::ListOrgTodos', sub=>'list_org_todos');
 
+1;
+# ABSTRACT: List todo items in Org files
 
 
+__END__
 =pod
 
 =head1 NAME
@@ -22,7 +26,7 @@ list_org_todos - List todo items in Org files
 
 =head1 VERSION
 
-version 0.07
+version 0.08
 
 =head1 SYNOPSIS
 
@@ -60,7 +64,4 @@ This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.
 
 =cut
-
-
-__END__
 

@@ -14,19 +14,19 @@ require Exporter;
 our @ISA       = qw(Exporter);
 our @EXPORT_OK = qw(list_org_todos);
 
-our $VERSION = '0.07'; # VERSION
+our $VERSION = '0.08'; # VERSION
 
 our %SPEC;
 
 my $spec = clone($App::ListOrgHeadlines::SPEC{list_org_headlines});
 $spec->{summary} = "List all todo items in all Org files";
 delete $spec->{args}{todo};
-#$spec->{args}{due_in}[1]{default} = 0;
+$spec->{args}{done}[1]{default} = 0;
 
 $SPEC{list_org_todos} = $spec;
 sub list_org_todos {
     my %args = @_;
-    #$args{due_in} //= 0;
+    $args{done} //= 0;
 
     App::ListOrgHeadlines::list_org_headlines(%args, todo=>1);
 }
@@ -43,7 +43,7 @@ App::ListOrgTodos - List todo items in Org files
 
 =head1 VERSION
 
-version 0.07
+version 0.08
 
 =head1 SYNOPSIS
 
@@ -74,7 +74,7 @@ Arguments (C<*> denotes required arguments):
 
 Show details instead of just titles.
 
-=item * B<done> => I<bool>
+=item * B<done> => I<bool> (default C<0>)
 
 Filter todo items that are done.
 
