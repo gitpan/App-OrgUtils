@@ -13,7 +13,7 @@ require Exporter;
 our @ISA       = qw(Exporter);
 our @EXPORT_OK = qw(list_org_anniversaries);
 
-our $VERSION = '0.08'; # VERSION
+our $VERSION = '0.09'; # VERSION
 
 our %SPEC;
 
@@ -182,7 +182,7 @@ _
 sub list_org_anniversaries {
     my %args = @_;
 
-    my $tz = $args{time_zone} // $ENV{TZ};
+    my $tz = $args{time_zone} // $ENV{TZ} // "UTC";
 
     # XXX schema
     my $files = $args{files};
@@ -224,7 +224,7 @@ App::ListOrgAnniversaries - List headlines in Org files
 
 =head1 VERSION
 
-version 0.08
+version 0.09
 
 =head1 SYNOPSIS
 

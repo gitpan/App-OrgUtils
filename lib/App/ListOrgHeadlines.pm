@@ -12,7 +12,7 @@ require Exporter;
 our @ISA       = qw(Exporter);
 our @EXPORT_OK = qw(list_org_headlines);
 
-our $VERSION = '0.08'; # VERSION
+our $VERSION = '0.09'; # VERSION
 
 our %SPEC;
 
@@ -176,7 +176,7 @@ _
 sub list_org_headlines {
     my %args = @_;
 
-    my $tz = $args{time_zone} // $ENV{TZ};
+    my $tz = $args{time_zone} // $ENV{TZ} // "UTC";
 
     my $files = $args{files};
     return [400, "Please specify files"] if !$files || !@$files;
@@ -214,7 +214,7 @@ App::ListOrgHeadlines - List headlines in Org files
 
 =head1 VERSION
 
-version 0.08
+version 0.09
 
 =head1 SYNOPSIS
 

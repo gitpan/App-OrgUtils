@@ -13,7 +13,7 @@ use String::Escape qw(elide printable);
 use Org::Parser;
 use Org::Dump;
 
-our $VERSION = '0.08'; # VERSION
+our $VERSION = '0.09'; # VERSION
 
 my $input = [<>];
 close STDIN; close ARGV; # so perl doesn't add ", <> line xx" upon dying
@@ -34,7 +34,7 @@ dump_org_structure - Dump Org document structure
 
 =head1 VERSION
 
-version 0.08
+version 0.09
 
 =head1 SYNOPSIS
 
