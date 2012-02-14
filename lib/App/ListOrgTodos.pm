@@ -14,7 +14,7 @@ require Exporter;
 our @ISA       = qw(Exporter);
 our @EXPORT_OK = qw(list_org_todos);
 
-our $VERSION = '0.09'; # VERSION
+our $VERSION = '0.10'; # VERSION
 
 our %SPEC;
 
@@ -22,6 +22,7 @@ my $spec = clone($App::ListOrgHeadlines::SPEC{list_org_headlines});
 $spec->{summary} = "List all todo items in all Org files";
 delete $spec->{args}{todo};
 $spec->{args}{done}[1]{default} = 0;
+$spec->{args}{done}[1]{sort} = 'due_date';
 
 $SPEC{list_org_todos} = $spec;
 sub list_org_todos {
@@ -43,7 +44,7 @@ App::ListOrgTodos - List todo items in Org files
 
 =head1 VERSION
 
-version 0.09
+version 0.10
 
 =head1 SYNOPSIS
 
@@ -104,6 +105,17 @@ Filter headlines that don't have the specified tags.
 
 Filter todo items that have this priority.
 
+=item * B<sort> => I<code|str> (default C<"due_date">)
+
+Specify sorting.
+
+If string, must be one of 'due_date', '-due_date' (descending).
+
+If code, sorting code will get [REC, DUE_DATE, HL] as the items to compare,
+where REC is the final record that will be returned as final result (can be a
+string or a hash, if 'detail' is enabled), DUE_DATE is the DateTime object (if
+any), and HL is the Org::Headline object.
+
 =item * B<state> => I<str>
 
 Filter todo items that have this state.
@@ -126,7 +138,7 @@ Steven Haryanto <stevenharyanto@gmail.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2011 by Steven Haryanto.
+This software is copyright (c) 2012 by Steven Haryanto.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

@@ -17,7 +17,7 @@ my %module_build_args = (
     "Steven Haryanto <stevenharyanto\@gmail.com>"
   ],
   "dist_name" => "App-OrgUtils",
-  "dist_version" => "0.09",
+  "dist_version" => "0.10",
   "license" => "perl",
   "module_name" => "App::OrgUtils",
   "recommends" => {},
@@ -30,10 +30,10 @@ my %module_build_args = (
     "perl" => "5.010000"
   },
   "script_files" => [
-    "bin/list-org-todos",
-    "bin/list-org-headlines",
+    "bin/dump-org-structure",
     "bin/list-org-anniversaries",
-    "bin/dump-org-structure"
+    "bin/list-org-headlines",
+    "bin/list-org-todos"
   ]
 );
 

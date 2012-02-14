@@ -13,7 +13,7 @@ require Exporter;
 our @ISA       = qw(Exporter);
 our @EXPORT_OK = qw(list_org_anniversaries);
 
-our $VERSION = '0.09'; # VERSION
+our $VERSION = '0.10'; # VERSION
 
 our %SPEC;
 
@@ -107,7 +107,7 @@ sub _process_hl {
                 $hl->title->as_string,
                 $hide_age ? $d->ymd : $date->ymd . " - " . $d->ymd);
             $log->debugf("Added this anniversary to result: %s", $msg);
-            push @$res, $msg;
+            push @$res, [$msg, $d];
             last DATE;
         }
     } # for @annivs
@@ -177,10 +177,28 @@ If not set, TZ environment variable will be picked as default.
 
 _
         }],
+        sort => [any => {
+            of => [
+                ['str*' => {in=>['due_date', '-due_date']}],
+                'code*'
+            ],
+            default => 'due_date',
+            summary => 'Specify sorting',
+            description => <<'_',
+
+If string, must be one of 'date', '-date' (descending).
+
+If code, sorting code will get [REC, DUE_DATE] as the items to compare, where
+REC is the final record that will be returned as final result (can be a string
+or a hash, if 'detail' is enabled), and DUE_DATE is the DateTime object.
+
+_
+        }],
    },
 };
 sub list_org_anniversaries {
     my %args = @_;
+    my $sort = $args{sort} // 'due_date';
 
     my $tz = $args{time_zone} // $ENV{TZ} // "UTC";
 
@@ -209,7 +227,24 @@ sub list_org_anniversaries {
             });
     } # for $file
 
-    [200, "OK", \@res];
+    if ($sort) {
+        if (ref($sort) eq 'CODE') {
+            @res = sort $sort @res;
+        } elsif ($sort =~ /^-?due_date$/) {
+            @res = sort {
+                my $dt1 = $a->[1];
+                my $dt2 = $b->[1];
+                my $comp = DateTime->compare($dt1, $dt2);
+                ($sort =~ /^-/ ? -1 : 1) * $comp;
+            } @res;
+        } else {
+            # XXX should die here because when Sah is ready, invalid values have
+            # been filtered
+            return [400, "Invalid sort argument"];
+        }
+    }
+
+    [200, "OK", [map {$_->[0]} @res]];
 }
 
 1;
@@ -224,7 +259,7 @@ App::ListOrgAnniversaries - List headlines in Org files
 
 =head1 VERSION
 
-version 0.09
+version 0.10
 
 =head1 SYNOPSIS
 
@@ -301,6 +336,16 @@ Filter headlines that don't have the specified tags.
 
 Don't show dates that are overdue more than this number of days.
 
+=item * B<sort> => I<code|str> (default C<"due_date">)
+
+Specify sorting.
+
+If string, must be one of 'date', '-date' (descending).
+
+If code, sorting code will get [REC, DUE_DATE] as the items to compare, where
+REC is the final record that will be returned as final result (can be a string
+or a hash, if 'detail' is enabled), and DUE_DATE is the DateTime object.
+
 =item * B<time_zone> => I<str>
 
 Will be passed to parser's options.
@@ -315,7 +360,7 @@ Steven Haryanto <stevenharyanto@gmail.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2011 by Steven Haryanto.
+This software is copyright (c) 2012 by Steven Haryanto.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

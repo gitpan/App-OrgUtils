@@ -12,7 +12,7 @@ require Exporter;
 our @ISA       = qw(Exporter);
 our @EXPORT_OK = qw(list_org_headlines);
 
-our $VERSION = '0.09'; # VERSION
+our $VERSION = '0.10'; # VERSION
 
 our %SPEC;
 
@@ -85,6 +85,7 @@ sub _process_hl {
     }
 
     my $r;
+    my $date;
     if ($args->{detail}) {
         $r               = {};
         $r->{file}       = $file;
@@ -97,6 +98,7 @@ sub _process_hl {
         $r->{todo_state} = $hl->todo_state;
         $r->{progress}   = $hl->progress;
         $r->{level}      = $hl->level;
+        $date = $r->{due_date};
     } else {
         if ($ats) {
             my $pl = abs($days) > 1 ? "s" : "";
@@ -106,11 +108,12 @@ sub _process_hl {
                                  "in $days day$pl",
                          $hl->title->as_string,
                          $ats->datetime->ymd);
+            $date = $ats->datetime;
         } else {
             $r = $hl->title->as_string;
         }
     }
-    push @$res, $r;
+    push @$res, [$r, $date, $hl];
 }
 
 $SPEC{list_org_headlines} = {
@@ -171,10 +174,29 @@ If not set, TZ environment variable will be picked as default.
 
 _
         }],
+        sort => [any => {
+            of => [
+                ['str*' => {in=>['due_date', '-due_date']}],
+                'code*'
+            ],
+            default => 'due_date',
+            summary => 'Specify sorting',
+            description => <<'_',
+
+If string, must be one of 'due_date', '-due_date' (descending).
+
+If code, sorting code will get [REC, DUE_DATE, HL] as the items to compare,
+where REC is the final record that will be returned as final result (can be a
+string or a hash, if 'detail' is enabled), DUE_DATE is the DateTime object (if
+any), and HL is the Org::Headline object.
+
+_
+        }],
     },
 };
 sub list_org_headlines {
     my %args = @_;
+    my $sort = $args{sort} // 'due_date';
 
     my $tz = $args{time_zone} // $ENV{TZ} // "UTC";
 
@@ -199,7 +221,33 @@ sub list_org_headlines {
             });
     } # for $file
 
-    [200, "OK", \@res];
+    if ($sort) {
+        if (ref($sort) eq 'CODE') {
+            @res = sort $sort @res;
+        } elsif ($sort =~ /^-?due_date$/) {
+            @res = sort {
+                my $dt1 = $a->[1];
+                my $dt2 = $b->[1];
+                my $comp;
+                if ($dt1 && !$dt2) {
+                    $comp = -1;
+                } elsif (!$dt1 && $dt2) {
+                    $comp = 1;
+                } elsif (!$dt1 && !$dt2) {
+                    $comp = 0;
+                } else {
+                    $comp = DateTime->compare($dt1, $dt2);
+                }
+                ($sort =~ /^-/ ? -1 : 1) * $comp;
+            } @res;
+        } else {
+            # XXX should die here because when Sah is ready, invalid values have
+            # been filtered
+            return [400, "Invalid sort argument"];
+        }
+    }
+
+    [200, "OK", [map {$_->[0]} @res]];
 }
 
 1;
@@ -214,7 +262,7 @@ App::ListOrgHeadlines - List headlines in Org files
 
 =head1 VERSION
 
-version 0.09
+version 0.10
 
 =head1 SYNOPSIS
 
@@ -275,6 +323,17 @@ Filter headlines that don't have the specified tags.
 
 Filter todo items that have this priority.
 
+=item * B<sort> => I<code|str> (default C<"due_date">)
+
+Specify sorting.
+
+If string, must be one of 'due_date', '-due_date' (descending).
+
+If code, sorting code will get [REC, DUE_DATE, HL] as the items to compare,
+where REC is the final record that will be returned as final result (can be a
+string or a hash, if 'detail' is enabled), DUE_DATE is the DateTime object (if
+any), and HL is the Org::Headline object.
+
 =item * B<state> => I<str>
 
 Filter todo items that have this state.
@@ -301,7 +360,7 @@ Steven Haryanto <stevenharyanto@gmail.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2011 by Steven Haryanto.
+This software is copyright (c) 2012 by Steven Haryanto.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.
