@@ -7,11 +7,11 @@ use 5.010;
 use strict;
 use warnings;
 
-use Sub::Spec::CmdLine qw(run);
+use Perinci::CmdLine;
 
-our $VERSION = '0.10'; # VERSION
+our $VERSION = '0.11'; # VERSION
 
-run(module => 'App::ListOrgTodos', sub=>'list_org_todos');
+Perinci::CmdLine->new(url => '/App/ListOrgTodos/list_org_todos')->run;
 
 1;
 # ABSTRACT: List todo items in Org files
@@ -26,7 +26,7 @@ list_org_todos - List todo items in Org files
 
 =head1 VERSION
 
-version 0.10
+version 0.11
 
 =head1 SYNOPSIS
 

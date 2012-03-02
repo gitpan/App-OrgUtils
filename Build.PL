@@ -17,7 +17,7 @@ my %module_build_args = (
     "Steven Haryanto <stevenharyanto\@gmail.com>"
   ],
   "dist_name" => "App-OrgUtils",
-  "dist_version" => "0.10",
+  "dist_version" => "0.11",
   "license" => "perl",
   "module_name" => "App::OrgUtils",
   "recommends" => {},
@@ -25,7 +25,7 @@ my %module_build_args = (
   "requires" => {
     "Lingua::EN::Numbers::Ordinate" => 0,
     "Org::Parser" => "0.20",
-    "Sub::Spec::CmdLine" => "0.30",
+    "Perinci::CmdLine" => 0,
     "Test::More" => "0.96",
     "perl" => "5.010000"
   },
