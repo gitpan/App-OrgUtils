@@ -14,7 +14,7 @@ require Exporter;
 our @ISA       = qw(Exporter);
 our @EXPORT_OK = qw(list_org_todos);
 
-our $VERSION = '0.11'; # VERSION
+our $VERSION = '0.12'; # VERSION
 
 our %SPEC;
 
@@ -44,7 +44,7 @@ App::ListOrgTodos - List todo items in Org files
 
 =head1 VERSION
 
-version 0.11
+version 0.12
 
 =head1 SYNOPSIS
 
@@ -56,26 +56,22 @@ version 0.11
 
 None are exported, but they are exportable.
 
-=head2 list_org_todos(%args) -> [STATUS_CODE, ERR_MSG, RESULT]
+=head1 FUNCTIONS
 
+
+=head2 list_org_todos(%args) -> [status, msg, result, meta]
 
 List all todo items in all Org files.
 
-Returns a 3-element arrayref. STATUS_CODE is 200 on success, or an error code
-between 3xx-5xx (just like in HTTP). ERR_MSG is a string containing error
-message, RESULT is the actual result.
-
-Arguments (C<*> denotes required arguments):
+Arguments ('*' denotes required arguments):
 
 =over 4
 
-=item * B<files>* => I<array>
-
-=item * B<detail> => I<bool> (default C<0>)
+=item * B<detail> => I<bool> (default: 0)
 
 Show details instead of just titles.
 
-=item * B<done> => I<bool> (default C<0>)
+=item * B<done> => I<bool> (default: 0)
 
 Filter todo items that are done.
 
@@ -85,19 +81,29 @@ Filter todo items which is due in this number of days.
 
 Note that if the todo's due date has warning period and the warning period is
 active, then it will also pass this filter irregardless. Example, if today is
-2011-06-30 and due_in is set to 7, then todo with due date <2011-07-10 > won't
-pass the filter but <2011-07-10 Sun +1y -14d> will (warning period 14 days is
+2011-06-30 and due_in is set to 7, then todo with due date  won't
+pass the filter but  will (warning period 14 days is
 already active by that time).
 
-=item * B<from_level> => I<int> (default C<1>)
+=item * B<files>* => I<array>
+
+=item * B<from_level> => I<int> (default: 1)
 
 Filter headlines having this level as the minimum.
+
+=item * B<group_by_tags> => I<bool> (default: 0)
+
+Whether to group result by tags.
+
+If set to true, instead of returning a list, this function will return a hash of
+lists, keyed by tag: {tag1: [hl1, hl2, ...], tag2: [...]}. Note that some
+headlines might be listed more than once if it has several tags.
 
 =item * B<has_tags> => I<array>
 
 Filter headlines that have the specified tags.
 
-=item * B<lack_tags> => I<array>
+=item * B<lacks_tags> => I<array>
 
 Filter headlines that don't have the specified tags.
 
@@ -105,15 +111,15 @@ Filter headlines that don't have the specified tags.
 
 Filter todo items that have this priority.
 
-=item * B<sort> => I<code|str> (default C<"due_date">)
+=item * B<sort> => I<code|str> (default: "due_date")
 
 Specify sorting.
 
-If string, must be one of 'due_date', '-due_date' (descending).
+If string, must be one of 'dueB<date', '-due>date' (descending).
 
-If code, sorting code will get [REC, DUE_DATE, HL] as the items to compare,
+If code, sorting code will get [REC, DUEB<DATE, HL] as the items to compare,
 where REC is the final record that will be returned as final result (can be a
-string or a hash, if 'detail' is enabled), DUE_DATE is the DateTime object (if
+string or a hash, if 'detail' is enabled), DUE>DATE is the DateTime object (if
 any), and HL is the Org::Headline object.
 
 =item * B<state> => I<str>
@@ -131,6 +137,10 @@ If not set, TZ environment variable will be picked as default.
 Filter headlines having this level as the maximum.
 
 =back
+
+Return value:
+
+Returns an enveloped result (an array). First element (status) is an integer containing HTTP status code (200 means OK, 4xx caller error, 5xx function error). Second element (msg) is a string containing error message, or 'OK' if status is 200. Third element (result) is optional, the actual result. Fourth element (meta) is called result metadata and is optional, a hash that contains extra information.
 
 =head1 AUTHOR
 

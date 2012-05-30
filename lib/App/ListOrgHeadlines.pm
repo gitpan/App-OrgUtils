@@ -6,13 +6,14 @@ use warnings;
 use Log::Any qw($log);
 
 use DateTime;
+use List::MoreUtils qw(uniq);
 use Org::Parser;
 
 require Exporter;
 our @ISA       = qw(Exporter);
 our @EXPORT_OK = qw(list_org_headlines);
 
-our $VERSION = '0.11'; # VERSION
+our $VERSION = '0.12'; # VERSION
 
 our %SPEC;
 
@@ -34,15 +35,15 @@ sub _process_hl {
         return unless $hl->is_todo &&
             $hl->todo_state eq $args->{state};
     }
-    if ($args->{has_tags} || $args->{lack_tags}) {
+    if ($args->{has_tags} || $args->{lacks_tags}) {
         my $tags = [$hl->get_tags];
         if ($args->{has_tags}) {
             for (@{ $args->{has_tags} }) {
                 return unless $_ ~~ @$tags;
             }
         }
-        if ($args->{lack_tags}) {
-            for (@{ $args->{lack_tags} }) {
+        if ($args->{lacks_tags}) {
+            for (@{ $args->{lacks_tags} }) {
                 return if $_ ~~ @$tags;
             }
         }
@@ -160,8 +161,23 @@ _
         has_tags => [array => {
             summary => 'Filter headlines that have the specified tags',
         }],
-        lack_tags => [array => {
+        lacks_tags => [array => {
             summary => 'Filter headlines that don\'t have the specified tags',
+            arg_aliases => {
+                lack_tags => {},
+                'lack-tags' => {},
+            },
+        }],
+        group_by_tags => [bool => {
+            summary => 'Whether to group result by tags',
+            default => 0,
+            description => <<'_',
+
+If set to true, instead of returning a list, this function will return a hash of
+lists, keyed by tag: {tag1: [hl1, hl2, ...], tag2: [...]}. Note that some
+headlines might be listed more than once if it has several tags.
+
+_
         }],
         priority => [str => {
             summary => 'Filter todo items that have this priority',
@@ -247,7 +263,28 @@ sub list_org_headlines {
         }
     }
 
-    [200, "OK", [map {$_->[0]} @res]];
+    my $res;
+    if ($args{group_by_tags}) {
+        # cache tags in each @res element's [3] element
+        for (@res) { $_->[3] = [$_->[2]->get_tags] }
+        my @tags = sort uniq map {@{$_->[3]}} @res;
+        $res = {};
+        for my $tag ('', @tags) {
+            $res->{$tag} = [];
+            for (@res) {
+                if ($tag eq '') {
+                    next if @{$_->[3]};
+                } else {
+                    next unless $tag ~~ @{$_->[3]};
+                }
+                push @{ $res->{$tag} }, $_->[0];
+            }
+        }
+    } else {
+        $res = [map {$_->[0]} @res];
+    }
+
+    [200, "OK", $res];
 }
 
 1;
@@ -262,7 +299,7 @@ App::ListOrgHeadlines - List headlines in Org files
 
 =head1 VERSION
 
-version 0.11
+version 0.12
 
 =head1 SYNOPSIS
 
@@ -274,22 +311,18 @@ version 0.11
 
 None are exported, but they are exportable.
 
-=head2 list_org_headlines(%args) -> [STATUS_CODE, ERR_MSG, RESULT]
+=head1 FUNCTIONS
 
+
+=head2 list_org_headlines(%args) -> [status, msg, result, meta]
 
 List all headlines in all Org files.
 
-Returns a 3-element arrayref. STATUS_CODE is 200 on success, or an error code
-between 3xx-5xx (just like in HTTP). ERR_MSG is a string containing error
-message, RESULT is the actual result.
-
-Arguments (C<*> denotes required arguments):
+Arguments ('*' denotes required arguments):
 
 =over 4
 
-=item * B<files>* => I<array>
-
-=item * B<detail> => I<bool> (default C<0>)
+=item * B<detail> => I<bool> (default: 0)
 
 Show details instead of just titles.
 
@@ -303,19 +336,29 @@ Filter todo items which is due in this number of days.
 
 Note that if the todo's due date has warning period and the warning period is
 active, then it will also pass this filter irregardless. Example, if today is
-2011-06-30 and due_in is set to 7, then todo with due date <2011-07-10 > won't
-pass the filter but <2011-07-10 Sun +1y -14d> will (warning period 14 days is
+2011-06-30 and due_in is set to 7, then todo with due date  won't
+pass the filter but  will (warning period 14 days is
 already active by that time).
 
-=item * B<from_level> => I<int> (default C<1>)
+=item * B<files>* => I<array>
+
+=item * B<from_level> => I<int> (default: 1)
 
 Filter headlines having this level as the minimum.
+
+=item * B<group_by_tags> => I<bool> (default: 0)
+
+Whether to group result by tags.
+
+If set to true, instead of returning a list, this function will return a hash of
+lists, keyed by tag: {tag1: [hl1, hl2, ...], tag2: [...]}. Note that some
+headlines might be listed more than once if it has several tags.
 
 =item * B<has_tags> => I<array>
 
 Filter headlines that have the specified tags.
 
-=item * B<lack_tags> => I<array>
+=item * B<lacks_tags> => I<array>
 
 Filter headlines that don't have the specified tags.
 
@@ -323,15 +366,15 @@ Filter headlines that don't have the specified tags.
 
 Filter todo items that have this priority.
 
-=item * B<sort> => I<code|str> (default C<"due_date">)
+=item * B<sort> => I<code|str> (default: "due_date")
 
 Specify sorting.
 
-If string, must be one of 'due_date', '-due_date' (descending).
+If string, must be one of 'dueB<date', '-due>date' (descending).
 
-If code, sorting code will get [REC, DUE_DATE, HL] as the items to compare,
+If code, sorting code will get [REC, DUEB<DATE, HL] as the items to compare,
 where REC is the final record that will be returned as final result (can be a
-string or a hash, if 'detail' is enabled), DUE_DATE is the DateTime object (if
+string or a hash, if 'detail' is enabled), DUE>DATE is the DateTime object (if
 any), and HL is the Org::Headline object.
 
 =item * B<state> => I<str>
@@ -348,11 +391,15 @@ If not set, TZ environment variable will be picked as default.
 
 Filter headlines having this level as the maximum.
 
-=item * B<todo> => I<bool> (default C<0>)
+=item * B<todo> => I<bool> (default: 0)
 
 Filter headlines that are todos.
 
 =back
+
+Return value:
+
+Returns an enveloped result (an array). First element (status) is an integer containing HTTP status code (200 means OK, 4xx caller error, 5xx function error). Second element (msg) is a string containing error message, or 'OK' if status is 200. Third element (result) is optional, the actual result. Fourth element (meta) is called result metadata and is optional, a hash that contains extra information.
 
 =head1 AUTHOR
 

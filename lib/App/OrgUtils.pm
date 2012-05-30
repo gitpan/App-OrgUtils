@@ -4,7 +4,7 @@ use 5.010;
 use strict;
 use warnings;
 
-our $VERSION = '0.11'; # VERSION
+our $VERSION = '0.12'; # VERSION
 
 1;
 #ABSTRACT: Some utilities for Org documents
@@ -18,7 +18,7 @@ App::OrgUtils - Some utilities for Org documents
 
 =head1 VERSION
 
-version 0.11
+version 0.12
 
 =head1 DESCRIPTION
 
@@ -28,6 +28,8 @@ documents; some originally created as examples/demos for L<Org::Parser>.
 =head1 SEE ALSO
 
 L<Org::Parser>
+
+=head1 FUNCTIONS
 
 =head1 AUTHOR
 

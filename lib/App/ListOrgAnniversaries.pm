@@ -13,7 +13,7 @@ require Exporter;
 our @ISA       = qw(Exporter);
 our @EXPORT_OK = qw(list_org_anniversaries);
 
-our $VERSION = '0.11'; # VERSION
+our $VERSION = '0.12'; # VERSION
 
 our %SPEC;
 
@@ -27,15 +27,15 @@ sub _process_hl {
 
     $log->tracef("Processing %s ...", $hl->title->as_string);
 
-    if ($args->{has_tags} || $args->{lack_tags}) {
+    if ($args->{has_tags} || $args->{lacks_tags}) {
         my $tags = [$hl->get_tags];
         if ($args->{has_tags}) {
             for (@{ $args->{has_tags} }) {
                 return unless $_ ~~ @$tags;
             }
         }
-        if ($args->{lack_tags}) {
-            for (@{ $args->{lack_tags} }) {
+        if ($args->{lacks_tags}) {
+            for (@{ $args->{lacks_tags} }) {
                 return if $_ ~~ @$tags;
             }
         }
@@ -140,7 +140,7 @@ ignored).
 By convention, if year is '1900' it is assumed to mean year is not specified.
 
 By default, all contacts' anniversaries will be listed. You can filter contacts
-using tags ('has_tags' and 'lack_tags' options), or by 'due_in' and
+using tags ('has_tags' and 'lacks_tags' options), or by 'due_in' and
 'max_overdue' options (due_in=14 and max_overdue=2 is what I commonly use in my
 startup script).
 
@@ -158,8 +158,12 @@ _
         has_tags => [array => {
             summary => 'Filter headlines that have the specified tags',
         }],
-        lack_tags => [array => {
+        lacks_tags => [array => {
             summary => 'Filter headlines that don\'t have the specified tags',
+            arg_aliases => {
+                lack_tags => {},
+                'lack-tags' => {},
+            },
         }],
         due_in => [int => {
             summary => 'Only show anniversaries that are due '.
@@ -259,7 +263,7 @@ App::ListOrgAnniversaries - List headlines in Org files
 
 =head1 VERSION
 
-version 0.11
+version 0.12
 
 =head1 SYNOPSIS
 
@@ -273,26 +277,54 @@ This module uses L<Log::Any> logging framework.
 
 None are exported, but they are exportable.
 
-=head2 list_org_anniversaries(%args) -> [STATUS_CODE, ERR_MSG, RESULT]
+=head1 FUNCTIONS
 
+
+=head2 list_org_anniversaries(%args) -> [status, msg, result, meta]
 
 List all anniversaries in Org files.
 
 This function expects contacts in the following format:
 
- * First last                              :office:friend:
+=over
+
+=item *
+
+First last                              :office:friend:
    :PROPERTIES:
    :BIRTHDAY:     1900-06-07
    :EMAIL:        foo@example.com
    :OTHERFIELD:   ...
    :END:
 
+
+=back
+
 or:
 
- * Some name                               :office:
-   - birthday   :: [1900-06-07 ]
-   - email      :: foo@example.com
-   - otherfield :: ...
+=over
+
+=item *
+
+Some name                               :office:
+
+
+=item *
+
+birthday   :: [1900-06-07 ]
+
+
+=item *
+
+email      :: foo@example.com
+
+
+=item *
+
+otherfield :: ...
+
+
+=back
 
 Using PROPERTIES, dates currently must be specified in "YYYY-MM-DD" format.
 Other format will be supported in the future. Using description list, dates can
@@ -302,33 +334,29 @@ ignored).
 By convention, if year is '1900' it is assumed to mean year is not specified.
 
 By default, all contacts' anniversaries will be listed. You can filter contacts
-using tags ('has_tags' and 'lack_tags' options), or by 'due_in' and
-'max_overdue' options (due_in=14 and max_overdue=2 is what I commonly use in my
+using tags ('hasB<tags' and 'lacks>tags' options), or by 'dueB<in' and
+'max>overdue' options (dueB<in=14 and max>overdue=2 is what I commonly use in my
 startup script).
 
-Returns a 3-element arrayref. STATUS_CODE is 200 on success, or an error code
-between 3xx-5xx (just like in HTTP). ERR_MSG is a string containing error
-message, RESULT is the actual result.
-
-Arguments (C<*> denotes required arguments):
+Arguments ('*' denotes required arguments):
 
 =over 4
-
-=item * B<files>* => I<array>
 
 =item * B<due_in> => I<int>
 
 Only show anniversaries that are due in this number of days.
 
-=item * B<field_pattern> => I<str> (default C<"(?:birthday|anniversary)">)
+=item * B<field_pattern> => I<str> (default: "(?:birthday|anniversary)")
 
 Field regex that specifies anniversaries.
+
+=item * B<files>* => I<array>
 
 =item * B<has_tags> => I<array>
 
 Filter headlines that have the specified tags.
 
-=item * B<lack_tags> => I<array>
+=item * B<lacks_tags> => I<array>
 
 Filter headlines that don't have the specified tags.
 
@@ -336,15 +364,15 @@ Filter headlines that don't have the specified tags.
 
 Don't show dates that are overdue more than this number of days.
 
-=item * B<sort> => I<code|str> (default C<"due_date">)
+=item * B<sort> => I<code|str> (default: "due_date")
 
 Specify sorting.
 
 If string, must be one of 'date', '-date' (descending).
 
-If code, sorting code will get [REC, DUE_DATE] as the items to compare, where
+If code, sorting code will get [REC, DUEB<DATE] as the items to compare, where
 REC is the final record that will be returned as final result (can be a string
-or a hash, if 'detail' is enabled), and DUE_DATE is the DateTime object.
+or a hash, if 'detail' is enabled), and DUE>DATE is the DateTime object.
 
 =item * B<time_zone> => I<str>
 
@@ -353,6 +381,10 @@ Will be passed to parser's options.
 If not set, TZ environment variable will be picked as default.
 
 =back
+
+Return value:
+
+Returns an enveloped result (an array). First element (status) is an integer containing HTTP status code (200 means OK, 4xx caller error, 5xx function error). Second element (msg) is a string containing error message, or 'OK' if status is 200. Third element (result) is optional, the actual result. Fourth element (meta) is called result metadata and is optional, a hash that contains extra information.
 
 =head1 AUTHOR
 
