@@ -1,20 +1,18 @@
 #!/usr/bin/perl
 
-# workaround for dzil
-package list_org_headlines;
-
 use 5.010;
 use strict;
 use warnings;
 
 use Perinci::CmdLine;
 
-our $VERSION = '0.12'; # VERSION
+our $VERSION = '0.13'; # VERSION
 
 Perinci::CmdLine->new(url=>'/App/ListOrgHeadlines/list_org_headlines')->run;
 
 1;
 # ABSTRACT: List headlines in Org files
+# PODNAME: list-org-headlines
 
 
 __END__
@@ -22,11 +20,11 @@ __END__
 
 =head1 NAME
 
-list_org_headlines - List headlines in Org files
+list-org-headlines - List headlines in Org files
 
 =head1 VERSION
 
-version 0.12
+version 0.13
 
 =head1 SYNOPSIS
 
