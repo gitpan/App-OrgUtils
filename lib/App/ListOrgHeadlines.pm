@@ -5,15 +5,17 @@ use strict;
 use warnings;
 use Log::Any qw($log);
 
+use App::OrgUtils;
+use Cwd qw(abs_path);
 use DateTime;
+use Digest::MD5 qw(md5_hex);
 use List::MoreUtils qw(uniq);
-use Org::Parser;
 
 require Exporter;
 our @ISA       = qw(Exporter);
 our @EXPORT_OK = qw(list_org_headlines);
 
-our $VERSION = '0.13'; # VERSION
+our $VERSION = '0.14'; # VERSION
 
 our %SPEC;
 
@@ -21,7 +23,7 @@ my $today;
 my $yest;
 
 sub _process_hl {
-    my ($file, $hl, $args, $res, $opts) = @_;
+    my ($file, $hl, $args, $res) = @_;
 
     return if $args->{from_level} && $hl->level < $args->{from_level};
     return if $args->{to_level}   && $hl->level > $args->{to_level};
@@ -125,6 +127,15 @@ $SPEC{list_org_headlines} = {
             arg_pos    => 0,
             arg_greedy => 1,
         }],
+        cache_dir => ['str*' => {
+            summary => 'Cache Org parse result',
+            description => <<'_',
+
+Since Org::Parser can spend some time to parse largish Org files, this is an
+option to store the parse result. Caching is turned on if this argument is set.
+
+_
+        }],
         todo => [bool => {
             summary => 'Filter headlines that are todos',
             default => 0,
@@ -190,6 +201,16 @@ If not set, TZ environment variable will be picked as default.
 
 _
         }],
+        today => [any => {
+            of => ['int', [obj => {isa=>'DateTime'}]],
+            summary => 'Assume today\'s date',
+            description => <<'_',
+
+You can provide Unix timestamp or DateTime object. If you provide a DateTime
+object, remember to set the correct time zone.
+
+_
+        }],
         sort => [any => {
             of => [
                 ['str*' => {in=>['due_date', '-due_date']}],
@@ -219,23 +240,30 @@ sub list_org_headlines {
     my $files = $args{files};
     return [400, "Please specify files"] if !$files || !@$files;
 
-    $today = DateTime->today(time_zone => $tz);
+    if ($args{today}) {
+        if (ref($args{today})) {
+            $today = $args{today};
+        } else {
+            $today = DateTime->from_epoch(epoch=>$args{today}, time_zone=>$tz);
+        }
+    } else {
+        $today = DateTime->today(time_zone => $tz);
+    }
     $yest  = $today->clone->add(days => -1);
 
-    my $orgp = Org::Parser->new;
     my @res;
 
-    for my $file (@$files) {
-        $log->debug("Parsing $file ...");
-        my $opts = {time_zone => $tz};
-        my $doc = $orgp->parse_file($file, $opts);
+    my %docs = App::OrgUtils::_load_org_files_with_cache(
+        $files, $args{cache_dir}, {time_zone=>$tz});
+    for my $file (keys %docs) {
+        my $doc = $docs{$file};
         $doc->walk(
             sub {
                 my ($el) = @_;
                 return unless $el->isa('Org::Element::Headline');
-                _process_hl($file, $el, \%args, \@res, $opts)
+                _process_hl($file, $el, \%args, \@res)
             });
-    } # for $file
+    }
 
     if ($sort) {
         if (ref($sort) eq 'CODE') {
@@ -299,7 +327,7 @@ App::ListOrgHeadlines - List headlines in Org files
 
 =head1 VERSION
 
-version 0.13
+version 0.14
 
 =head1 SYNOPSIS
 
@@ -321,6 +349,13 @@ List all headlines in all Org files.
 Arguments ('*' denotes required arguments):
 
 =over 4
+
+=item * B<cache_dir>* => I<str>
+
+Cache Org parse result.
+
+Since Org::Parser can spend some time to parse largish Org files, this is an
+option to store the parse result. Caching is turned on if this argument is set.
 
 =item * B<detail> => I<bool> (default: 0)
 
@@ -390,6 +425,13 @@ If not set, TZ environment variable will be picked as default.
 =item * B<to_level> => I<int>
 
 Filter headlines having this level as the maximum.
+
+=item * B<today> => I<int|obj>
+
+Assume today's date.
+
+You can provide Unix timestamp or DateTime object. If you provide a DateTime
+object, remember to set the correct time zone.
 
 =item * B<todo> => I<bool> (default: 0)
 

@@ -6,11 +6,10 @@ use warnings;
 use open qw(:std :utf8);
 use Log::Any qw($log);
 
-use String::Escape qw(elide printable);
 use Org::Parser;
 use Org::Dump;
 
-our $VERSION = '0.13'; # VERSION
+our $VERSION = '0.14'; # VERSION
 
 my $input = [<>];
 close STDIN; close ARGV; # so perl doesn't add ", <> line xx" upon dying
@@ -32,7 +31,7 @@ dump-org-structure - Dump Org document structure
 
 =head1 VERSION
 
-version 0.13
+version 0.14
 
 =head1 SYNOPSIS
 

@@ -5,15 +5,17 @@ use strict;
 use warnings;
 use Log::Any qw($log);
 
+use Cwd qw(abs_path);
 use DateTime;
+use Digest::MD5 qw(md5_hex);
 use Lingua::EN::Numbers::Ordinate;
-use Org::Parser;
+use App::OrgUtils;
 
 require Exporter;
 our @ISA       = qw(Exporter);
 our @EXPORT_OK = qw(list_org_anniversaries);
 
-our $VERSION = '0.13'; # VERSION
+our $VERSION = '0.14'; # VERSION
 
 our %SPEC;
 
@@ -21,7 +23,7 @@ my $today;
 my $yest;
 
 sub _process_hl {
-    my ($file, $hl, $args, $res, $opts) = @_;
+    my ($file, $hl, $args, $res, $tz) = @_;
 
     return unless $hl->is_leaf;
 
@@ -65,7 +67,7 @@ sub _process_hl {
                     }
                     push @annivs,
                         [$k, DateTime->new(year=>$1, month=>$2, day=>$3,
-                                       time_zone=>$opts->{time_zone})];
+                                       time_zone=>$tz)];
                     return;
                 }
             }
@@ -151,6 +153,15 @@ _
             arg_pos    => 0,
             arg_greedy => 1,
         }],
+        cache_dir => ['str*' => {
+            summary => 'Cache Org parse result',
+            description => <<'_',
+
+Since Org::Parser can spend some time to parse largish Org files, this is an
+option to store the parse result. Caching is turned on if this argument is set.
+
+_
+        }],
         field_pattern => [str => {
             summary => 'Field regex that specifies anniversaries',
             default => '(?:birthday|anniversary)'
@@ -178,6 +189,16 @@ _
             description => <<'_',
 
 If not set, TZ environment variable will be picked as default.
+
+_
+        }],
+        today => [any => {
+            of => ['int', [obj => {isa=>'DateTime'}]],
+            summary => 'Assume today\'s date',
+            description => <<'_',
+
+You can provide Unix timestamp or DateTime object. If you provide a DateTime
+object, remember to set the correct time zone.
 
 _
         }],
@@ -213,23 +234,31 @@ sub list_org_anniversaries {
     return [400, "Invalid field_pattern: $@"] unless eval { $f = qr/$f/i };
     $args{field_pattern} = $f;
 
-    $today = DateTime->today(time_zone => $tz);
+    if ($args{today}) {
+        if (ref($args{today})) {
+            $today = $args{today};
+        } else {
+            $today = DateTime->from_epoch(epoch=>$args{today}, time_zone=>$tz);
+        }
+    } else {
+        $today = DateTime->today(time_zone => $tz);
+    }
     $yest  = $today->clone->add(days => -1);
 
     my $orgp = Org::Parser->new;
     my @res;
 
-    for my $file (@$files) {
-        $log->debug("Parsing $file ...");
-        my $opts = {time_zone => $tz};
-        my $doc = $orgp->parse_file($file, $opts);
+    my %docs = App::OrgUtils::_load_org_files_with_cache(
+        $files, $args{cache_dir}, {time_zone=>$tz});
+    for my $file (keys %docs) {
+        my $doc = $docs{$file};
         $doc->walk(
             sub {
                 my ($el) = @_;
                 return unless $el->isa('Org::Element::Headline');
-                _process_hl($file, $el, \%args, \@res, $opts)
+                _process_hl($file, $el, \%args, \@res, $tz);
             });
-    } # for $file
+    }
 
     if ($sort) {
         if (ref($sort) eq 'CODE') {
@@ -263,7 +292,7 @@ App::ListOrgAnniversaries - List headlines in Org files
 
 =head1 VERSION
 
-version 0.13
+version 0.14
 
 =head1 SYNOPSIS
 
@@ -342,6 +371,13 @@ Arguments ('*' denotes required arguments):
 
 =over 4
 
+=item * B<cache_dir>* => I<str>
+
+Cache Org parse result.
+
+Since Org::Parser can spend some time to parse largish Org files, this is an
+option to store the parse result. Caching is turned on if this argument is set.
+
 =item * B<due_in> => I<int>
 
 Only show anniversaries that are due in this number of days.
@@ -379,6 +415,13 @@ or a hash, if 'detail' is enabled), and DUE>DATE is the DateTime object.
 Will be passed to parser's options.
 
 If not set, TZ environment variable will be picked as default.
+
+=item * B<today> => I<int|obj>
+
+Assume today's date.
+
+You can provide Unix timestamp or DateTime object. If you provide a DateTime
+object, remember to set the correct time zone.
 
 =back
 

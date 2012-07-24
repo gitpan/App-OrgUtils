@@ -7,14 +7,12 @@ use Log::Any qw($log);
 
 use App::ListOrgHeadlines qw(list_org_headlines);
 use Data::Clone;
-use DateTime;
-use Org::Parser;
 
 require Exporter;
 our @ISA       = qw(Exporter);
 our @EXPORT_OK = qw(list_org_todos);
 
-our $VERSION = '0.13'; # VERSION
+our $VERSION = '0.14'; # VERSION
 
 our %SPEC;
 
@@ -44,7 +42,7 @@ App::ListOrgTodos - List todo items in Org files
 
 =head1 VERSION
 
-version 0.13
+version 0.14
 
 =head1 SYNOPSIS
 
@@ -66,6 +64,13 @@ List all todo items in all Org files.
 Arguments ('*' denotes required arguments):
 
 =over 4
+
+=item * B<cache_dir>* => I<str>
+
+Cache Org parse result.
+
+Since Org::Parser can spend some time to parse largish Org files, this is an
+option to store the parse result. Caching is turned on if this argument is set.
 
 =item * B<detail> => I<bool> (default: 0)
 
@@ -135,6 +140,13 @@ If not set, TZ environment variable will be picked as default.
 =item * B<to_level> => I<int>
 
 Filter headlines having this level as the maximum.
+
+=item * B<today> => I<int|obj>
+
+Assume today's date.
+
+You can provide Unix timestamp or DateTime object. If you provide a DateTime
+object, remember to set the correct time zone.
 
 =back
 

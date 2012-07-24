@@ -6,7 +6,7 @@ use warnings;
 
 use Perinci::CmdLine;
 
-our $VERSION = '0.13'; # VERSION
+our $VERSION = '0.14'; # VERSION
 
 Perinci::CmdLine->new(url=>'/App/ListOrgHeadlines/list_org_headlines')->run;
 
@@ -24,7 +24,7 @@ list-org-headlines - List headlines in Org files
 
 =head1 VERSION
 
-version 0.13
+version 0.14
 
 =head1 SYNOPSIS
 

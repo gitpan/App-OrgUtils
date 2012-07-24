@@ -8,7 +8,7 @@ build_requires:
 configure_requires:
   Module::Build: 0.3601
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 4.300006, CPAN::Meta::Converter version 2.113640'
+generated_by: 'Dist::Zilla version 4.300002, CPAN::Meta::Converter version 2.112150'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -17,10 +17,10 @@ name: App-OrgUtils
 requires:
   Lingua::EN::Numbers::Ordinate: 0
   List::MoreUtils: 0
-  Org::Parser: 0.20
+  Org::Parser: 0.26
   Perinci::CmdLine: 0
   perl: 5.010000
 resources:
   homepage: http://search.cpan.org/dist/App-OrgUtils/
   repository: http://github.com/sharyanto/perl-App-OrgUtils
-version: 0.13
+version: 0.14
