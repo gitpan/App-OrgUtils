@@ -4,7 +4,7 @@
       "Steven Haryanto <stevenharyanto@gmail.com>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 4.300002, CPAN::Meta::Converter version 2.112150",
+   "generated_by" : "Dist::Zilla version 4.300006, CPAN::Meta::Converter version 2.113640",
    "license" : [
       "perl_5"
    ],
@@ -29,7 +29,7 @@
             "Lingua::EN::Numbers::Ordinate" : 0,
             "List::MoreUtils" : 0,
             "Org::Parser" : "0.26",
-            "Perinci::CmdLine" : 0,
+            "Perinci::CmdLine" : "0.56",
             "perl" : "5.010000"
          }
       },
@@ -46,6 +46,6 @@
          "url" : "http://github.com/sharyanto/perl-App-OrgUtils"
       }
    },
-   "version" : "0.14"
+   "version" : "0.15"
 }
 

@@ -15,7 +15,7 @@ require Exporter;
 our @ISA       = qw(Exporter);
 our @EXPORT_OK = qw(list_org_anniversaries);
 
-our $VERSION = '0.14'; # VERSION
+our $VERSION = '0.15'; # VERSION
 
 our %SPEC;
 
@@ -292,7 +292,7 @@ App::ListOrgAnniversaries - List headlines in Org files
 
 =head1 VERSION
 
-version 0.14
+version 0.15
 
 =head1 SYNOPSIS
 
@@ -306,8 +306,15 @@ This module uses L<Log::Any> logging framework.
 
 None are exported, but they are exportable.
 
+=head1 DESCRIPTION
+
+
+This module has L<Rinci> metadata.
+
 =head1 FUNCTIONS
 
+
+None are exported by default, but they are exportable.
 
 =head2 list_org_anniversaries(%args) -> [status, msg, result, meta]
 
@@ -363,15 +370,15 @@ ignored).
 By convention, if year is '1900' it is assumed to mean year is not specified.
 
 By default, all contacts' anniversaries will be listed. You can filter contacts
-using tags ('hasB<tags' and 'lacks>tags' options), or by 'dueB<in' and
-'max>overdue' options (dueB<in=14 and max>overdue=2 is what I commonly use in my
+using tags ('hasI<tags' and 'lacks>tags' options), or by 'dueI<in' and
+'max>overdue' options (dueI<in=14 and max>overdue=2 is what I commonly use in my
 startup script).
 
 Arguments ('*' denotes required arguments):
 
 =over 4
 
-=item * B<cache_dir>* => I<str>
+=item * B<cache_dir> => I<str>
 
 Cache Org parse result.
 
@@ -386,7 +393,7 @@ Only show anniversaries that are due in this number of days.
 
 Field regex that specifies anniversaries.
 
-=item * B<files>* => I<array>
+=item * B<files> => I<array>
 
 =item * B<has_tags> => I<array>
 
@@ -406,7 +413,7 @@ Specify sorting.
 
 If string, must be one of 'date', '-date' (descending).
 
-If code, sorting code will get [REC, DUEB<DATE] as the items to compare, where
+If code, sorting code will get [REC, DUEI<DATE] as the items to compare, where
 REC is the final record that will be returned as final result (can be a string
 or a hash, if 'detail' is enabled), and DUE>DATE is the DateTime object.
 

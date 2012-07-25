@@ -15,7 +15,7 @@ require Exporter;
 our @ISA       = qw(Exporter);
 our @EXPORT_OK = qw(list_org_headlines);
 
-our $VERSION = '0.14'; # VERSION
+our $VERSION = '0.15'; # VERSION
 
 our %SPEC;
 
@@ -327,7 +327,7 @@ App::ListOrgHeadlines - List headlines in Org files
 
 =head1 VERSION
 
-version 0.14
+version 0.15
 
 =head1 SYNOPSIS
 
@@ -339,8 +339,15 @@ version 0.14
 
 None are exported, but they are exportable.
 
+=head1 DESCRIPTION
+
+
+This module has L<Rinci> metadata.
+
 =head1 FUNCTIONS
 
+
+None are exported by default, but they are exportable.
 
 =head2 list_org_headlines(%args) -> [status, msg, result, meta]
 
@@ -350,7 +357,7 @@ Arguments ('*' denotes required arguments):
 
 =over 4
 
-=item * B<cache_dir>* => I<str>
+=item * B<cache_dir> => I<str>
 
 Cache Org parse result.
 
@@ -375,7 +382,7 @@ active, then it will also pass this filter irregardless. Example, if today is
 pass the filter but  will (warning period 14 days is
 already active by that time).
 
-=item * B<files>* => I<array>
+=item * B<files> => I<array>
 
 =item * B<from_level> => I<int> (default: 1)
 
@@ -405,9 +412,9 @@ Filter todo items that have this priority.
 
 Specify sorting.
 
-If string, must be one of 'dueB<date', '-due>date' (descending).
+If string, must be one of 'dueI<date', '-due>date' (descending).
 
-If code, sorting code will get [REC, DUEB<DATE, HL] as the items to compare,
+If code, sorting code will get [REC, DUEI<DATE, HL] as the items to compare,
 where REC is the final record that will be returned as final result (can be a
 string or a hash, if 'detail' is enabled), DUE>DATE is the DateTime object (if
 any), and HL is the Org::Headline object.

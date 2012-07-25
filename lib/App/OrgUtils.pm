@@ -7,7 +7,7 @@ use Log::Any '$log';
 
 use Org::Parser;
 
-our $VERSION = '0.14'; # VERSION
+our $VERSION = '0.15'; # VERSION
 
 sub _load_org_files_with_cache {
     require Cwd;
@@ -50,7 +50,7 @@ App::OrgUtils - Some utilities for Org documents
 
 =head1 VERSION
 
-version 0.14
+version 0.15
 
 =head1 DESCRIPTION
 
@@ -61,7 +61,15 @@ documents; some originally created as examples/demos for L<Org::Parser>.
 
 L<Org::Parser>
 
+=head1 DESCRIPTION
+
+
+This module has L<Rinci> metadata.
+
 =head1 FUNCTIONS
+
+
+None are exported by default, but they are exportable.
 
 =head1 AUTHOR
 

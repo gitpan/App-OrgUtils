@@ -4,10 +4,11 @@ use 5.010;
 use strict;
 use warnings;
 
-our $VERSION = '0.14'; # VERSION
+our $VERSION = '0.15'; # VERSION
 
 use Perinci::CmdLine;
 
+binmode STDOUT, ":utf8";
 Perinci::CmdLine->new(
     url => '/App/ListOrgAnniversaries/list_org_anniversaries')->run;
 
@@ -25,7 +26,7 @@ list-org-anniversaries - List anniversaries in Org files
 
 =head1 VERSION
 
-version 0.14
+version 0.15
 
 =head1 SYNOPSIS
 

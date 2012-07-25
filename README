@@ -2,7 +2,7 @@ NAME
     App::OrgUtils - Some utilities for Org documents
 
 VERSION
-    version 0.14
+    version 0.15
 
 DESCRIPTION
     This distribution includes a few modules (scripts) for dealing with Org
@@ -11,7 +11,12 @@ DESCRIPTION
 SEE ALSO
     Org::Parser
 
+DESCRIPTION
+    This module has Rinci metadata.
+
 FUNCTIONS
+    None are exported by default, but they are exportable.
+
 AUTHOR
     Steven Haryanto <stevenharyanto@gmail.com>
 
