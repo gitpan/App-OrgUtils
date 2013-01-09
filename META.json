@@ -24,18 +24,22 @@
             "Module::Build" : "0.3601"
          }
       },
+      "develop" : {
+         "requires" : {
+            "Test::Rinci" : "0.01"
+         }
+      },
       "runtime" : {
          "requires" : {
+            "Data::Clone" : 0,
+            "DateTime" : 0,
             "Lingua::EN::Numbers::Ordinate" : 0,
             "List::MoreUtils" : 0,
+            "Log::Any" : 0,
+            "Org::Dump" : 0,
             "Org::Parser" : "0.26",
             "Perinci::CmdLine" : "0.56",
             "perl" : "5.010000"
-         }
-      },
-      "test" : {
-         "requires" : {
-            "Test::More" : "0.96"
          }
       }
    },
@@ -46,6 +50,6 @@
          "url" : "http://github.com/sharyanto/perl-App-OrgUtils"
       }
    },
-   "version" : "0.15"
+   "version" : "0.16"
 }
 

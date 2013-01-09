@@ -12,15 +12,15 @@ require Exporter;
 our @ISA       = qw(Exporter);
 our @EXPORT_OK = qw(list_org_todos);
 
-our $VERSION = '0.15'; # VERSION
+our $VERSION = '0.16'; # VERSION
 
 our %SPEC;
 
 my $spec = clone($App::ListOrgHeadlines::SPEC{list_org_headlines});
 $spec->{summary} = "List all todo items in all Org files";
 delete $spec->{args}{todo};
-$spec->{args}{done}[1]{default} = 0;
-$spec->{args}{done}[1]{sort} = 'due_date';
+$spec->{args}{done}{schema}[1]{default} = 0;
+$spec->{args}{sort}{schema}[1]{default} = 'due_date';
 
 $SPEC{list_org_todos} = $spec;
 sub list_org_todos {
@@ -42,7 +42,7 @@ App::ListOrgTodos - List todo items in Org files
 
 =head1 VERSION
 
-version 0.15
+version 0.16
 
 =head1 SYNOPSIS
 
@@ -85,23 +85,28 @@ Show details instead of just titles.
 
 =item * B<done> => I<bool> (default: 0)
 
-Filter todo items that are done.
+Only show todo items that are done.
 
 =item * B<due_in> => I<int>
 
-Filter todo items which is due in this number of days.
+Only show todo items that are (nearing|passed) due.
 
-Note that if the todo's due date has warning period and the warning period is
-active, then it will also pass this filter irregardless. Example, if today is
-2011-06-30 and due_in is set to 7, then todo with due date  won't
-pass the filter but  will (warning period 14 days is
-already active by that time).
+If value is not set, then will use todo item's warning period (or, if todo item
+does not have due date or warning period in its due date, will use the default
+14 days).
 
-=item * B<files> => I<array>
+If value is set to something smaller than the warning period, the todo item will
+still be considered nearing due when the warning period is passed. For example,
+if today is 2011-06-30 and due_in is set to 7, then todo item with due date
+ won't pass the filter (it's still 10 days in the future, larger
+than 7) but  will (warning period 14 days is already
+passed by that time).
+
+=item * B<files>* => I<array>
 
 =item * B<from_level> => I<int> (default: 1)
 
-Filter headlines having this level as the minimum.
+Only show headlines having this level as the minimum.
 
 =item * B<group_by_tags> => I<bool> (default: 0)
 
@@ -113,17 +118,17 @@ headlines might be listed more than once if it has several tags.
 
 =item * B<has_tags> => I<array>
 
-Filter headlines that have the specified tags.
+Only show headlines that have the specified tags.
 
 =item * B<lacks_tags> => I<array>
 
-Filter headlines that don't have the specified tags.
+Only show headlines that don't have the specified tags.
 
 =item * B<priority> => I<str>
 
-Filter todo items that have this priority.
+Only show todo items that have this priority.
 
-=item * B<sort> => I<code|str> (default: "due_date")
+=item * B<sort> => I<any> (default: "due_date")
 
 Specify sorting.
 
@@ -136,7 +141,7 @@ any), and HL is the Org::Headline object.
 
 =item * B<state> => I<str>
 
-Filter todo items that have this state.
+Only show todo items that have this state.
 
 =item * B<time_zone> => I<str>
 
@@ -146,9 +151,9 @@ If not set, TZ environment variable will be picked as default.
 
 =item * B<to_level> => I<int>
 
-Filter headlines having this level as the maximum.
+Only show headlines having this level as the maximum.
 
-=item * B<today> => I<int|obj>
+=item * B<today> => I<any>
 
 Assume today's date.
 
@@ -167,7 +172,7 @@ Steven Haryanto <stevenharyanto@gmail.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2012 by Steven Haryanto.
+This software is copyright (c) 2013 by Steven Haryanto.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

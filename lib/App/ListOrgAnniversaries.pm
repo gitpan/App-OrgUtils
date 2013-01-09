@@ -5,17 +5,18 @@ use strict;
 use warnings;
 use Log::Any qw($log);
 
+use App::OrgUtils;
 use Cwd qw(abs_path);
 use DateTime;
 use Digest::MD5 qw(md5_hex);
 use Lingua::EN::Numbers::Ordinate;
-use App::OrgUtils;
+use Scalar::Util qw(reftype);
 
 require Exporter;
 our @ISA       = qw(Exporter);
 our @EXPORT_OK = qw(list_org_anniversaries);
 
-our $VERSION = '0.15'; # VERSION
+our $VERSION = '0.16'; # VERSION
 
 our %SPEC;
 
@@ -171,10 +172,6 @@ _
         }],
         lacks_tags => [array => {
             summary => 'Filter headlines that don\'t have the specified tags',
-            arg_aliases => {
-                lack_tags => {},
-                'lack-tags' => {},
-            },
         }],
         due_in => [int => {
             summary => 'Only show anniversaries that are due '.
@@ -193,7 +190,8 @@ If not set, TZ environment variable will be picked as default.
 _
         }],
         today => [any => {
-            of => ['int', [obj => {isa=>'DateTime'}]],
+            # disable temporarily due to Data::Sah broken - 2012-12-25
+            #of => ['int', [obj => {isa=>'DateTime'}]],
             summary => 'Assume today\'s date',
             description => <<'_',
 
@@ -203,10 +201,11 @@ object, remember to set the correct time zone.
 _
         }],
         sort => [any => {
-            of => [
-                ['str*' => {in=>['due_date', '-due_date']}],
-                'code*'
-            ],
+            # disable temporarily due to Data::Sah broken - 2012-12-25
+            #of => [
+            #    ['str*' => {in=>['due_date', '-due_date']}],
+            #    'code*'
+            #],
             default => 'due_date',
             summary => 'Specify sorting',
             description => <<'_',
@@ -261,7 +260,7 @@ sub list_org_anniversaries {
     }
 
     if ($sort) {
-        if (ref($sort) eq 'CODE') {
+        if ((reftype($sort)//'') eq 'CODE') {
             @res = sort $sort @res;
         } elsif ($sort =~ /^-?due_date$/) {
             @res = sort {
@@ -277,7 +276,8 @@ sub list_org_anniversaries {
         }
     }
 
-    [200, "OK", [map {$_->[0]} @res]];
+    [200, "OK", [map {$_->[0]} @res],
+     {result_format_opts=>{list_max_columns=>1}}];
 }
 
 1;
@@ -292,7 +292,7 @@ App::ListOrgAnniversaries - List headlines in Org files
 
 =head1 VERSION
 
-version 0.15
+version 0.16
 
 =head1 SYNOPSIS
 
@@ -407,7 +407,7 @@ Filter headlines that don't have the specified tags.
 
 Don't show dates that are overdue more than this number of days.
 
-=item * B<sort> => I<code|str> (default: "due_date")
+=item * B<sort> => I<any> (default: "due_date")
 
 Specify sorting.
 
@@ -423,7 +423,7 @@ Will be passed to parser's options.
 
 If not set, TZ environment variable will be picked as default.
 
-=item * B<today> => I<int|obj>
+=item * B<today> => I<any>
 
 Assume today's date.
 
@@ -442,7 +442,7 @@ Steven Haryanto <stevenharyanto@gmail.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2012 by Steven Haryanto.
+This software is copyright (c) 2013 by Steven Haryanto.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.
