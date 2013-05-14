@@ -1,0 +1,75 @@
+#!/usr/bin/perl
+
+use 5.010;
+use strict;
+use warnings;
+
+use Org::Parser;
+
+our $VERSION = '0.17'; # VERSION
+
+my $org = Org::Parser->new;
+my $doc;
+{
+    local $/;
+    $doc = $org->parse(~~<>);
+}
+
+my $n = 0;
+$doc->walk(
+    sub {
+        my $el = shift;
+        $n++ if $el->isa('Org::Element::Headline') &&
+            $el->is_todo && !$el->is_done;
+    });
+
+say $n;
+
+# ABSTRACT: Count todos which are undone in Org document
+# PODNAME: count-undone-org-todos
+
+
+__END__
+=pod
+
+=head1 NAME
+
+count-undone-org-todos - Count todos which are undone in Org document
+
+=head1 VERSION
+
+version 0.17
+
+=head1 SYNOPSIS
+
+ % count-undone-org-todos todo.org
+ 42
+
+which is equivalent to:
+
+ % list-org-todos todo.org | wc -l
+ % list-org-todos --nodone todo.org | wc -l
+
+=head1 SEE ALSO
+
+L<Org::Parser>
+
+L<count-done-org-todos>
+
+L<count-org-todos>
+
+L<list-org-todos>
+
+=head1 AUTHOR
+
+Steven Haryanto <stevenharyanto@gmail.com>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2013 by Steven Haryanto.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut
+

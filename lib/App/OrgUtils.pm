@@ -7,7 +7,7 @@ use Log::Any '$log';
 
 use Org::Parser;
 
-our $VERSION = '0.16'; # VERSION
+our $VERSION = '0.17'; # VERSION
 
 sub _load_org_files_with_cache {
     require Cwd;
@@ -50,7 +50,7 @@ App::OrgUtils - Some utilities for Org documents
 
 =head1 VERSION
 
-version 0.16
+version 0.17
 
 =head1 DESCRIPTION
 
@@ -60,16 +60,6 @@ documents; some originally created as examples/demos for L<Org::Parser>.
 =head1 SEE ALSO
 
 L<Org::Parser>
-
-=head1 DESCRIPTION
-
-
-This module has L<Rinci> metadata.
-
-=head1 FUNCTIONS
-
-
-None are exported by default, but they are exportable.
 
 =head1 AUTHOR
 
@@ -81,6 +71,8 @@ This software is copyright (c) 2013 by Steven Haryanto.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.
+
+=head1 FUNCTIONS
 
 =cut
 

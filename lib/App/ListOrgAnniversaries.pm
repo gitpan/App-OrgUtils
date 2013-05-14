@@ -16,7 +16,7 @@ require Exporter;
 our @ISA       = qw(Exporter);
 our @EXPORT_OK = qw(list_org_anniversaries);
 
-our $VERSION = '0.16'; # VERSION
+our $VERSION = '0.17'; # VERSION
 
 our %SPEC;
 
@@ -292,7 +292,7 @@ App::ListOrgAnniversaries - List headlines in Org files
 
 =head1 VERSION
 
-version 0.16
+version 0.17
 
 =head1 SYNOPSIS
 
@@ -306,131 +306,10 @@ This module uses L<Log::Any> logging framework.
 
 None are exported, but they are exportable.
 
-=head1 DESCRIPTION
 
+=head2 list_org_anniversaries() -> [status, msg, result, meta]
 
-This module has L<Rinci> metadata.
-
-=head1 FUNCTIONS
-
-
-None are exported by default, but they are exportable.
-
-=head2 list_org_anniversaries(%args) -> [status, msg, result, meta]
-
-List all anniversaries in Org files.
-
-This function expects contacts in the following format:
-
-=over
-
-=item *
-
-First last                              :office:friend:
-   :PROPERTIES:
-   :BIRTHDAY:     1900-06-07
-   :EMAIL:        foo@example.com
-   :OTHERFIELD:   ...
-   :END:
-
-
-=back
-
-or:
-
-=over
-
-=item *
-
-Some name                               :office:
-
-
-=item *
-
-birthday   :: [1900-06-07 ]
-
-
-=item *
-
-email      :: foo@example.com
-
-
-=item *
-
-otherfield :: ...
-
-
-=back
-
-Using PROPERTIES, dates currently must be specified in "YYYY-MM-DD" format.
-Other format will be supported in the future. Using description list, dates can
-be specified using normal Org timestamps (repeaters and warning periods will be
-ignored).
-
-By convention, if year is '1900' it is assumed to mean year is not specified.
-
-By default, all contacts' anniversaries will be listed. You can filter contacts
-using tags ('hasI<tags' and 'lacks>tags' options), or by 'dueI<in' and
-'max>overdue' options (dueI<in=14 and max>overdue=2 is what I commonly use in my
-startup script).
-
-Arguments ('*' denotes required arguments):
-
-=over 4
-
-=item * B<cache_dir> => I<str>
-
-Cache Org parse result.
-
-Since Org::Parser can spend some time to parse largish Org files, this is an
-option to store the parse result. Caching is turned on if this argument is set.
-
-=item * B<due_in> => I<int>
-
-Only show anniversaries that are due in this number of days.
-
-=item * B<field_pattern> => I<str> (default: "(?:birthday|anniversary)")
-
-Field regex that specifies anniversaries.
-
-=item * B<files> => I<array>
-
-=item * B<has_tags> => I<array>
-
-Filter headlines that have the specified tags.
-
-=item * B<lacks_tags> => I<array>
-
-Filter headlines that don't have the specified tags.
-
-=item * B<max_overdue> => I<int>
-
-Don't show dates that are overdue more than this number of days.
-
-=item * B<sort> => I<any> (default: "due_date")
-
-Specify sorting.
-
-If string, must be one of 'date', '-date' (descending).
-
-If code, sorting code will get [REC, DUEI<DATE] as the items to compare, where
-REC is the final record that will be returned as final result (can be a string
-or a hash, if 'detail' is enabled), and DUE>DATE is the DateTime object.
-
-=item * B<time_zone> => I<str>
-
-Will be passed to parser's options.
-
-If not set, TZ environment variable will be picked as default.
-
-=item * B<today> => I<any>
-
-Assume today's date.
-
-You can provide Unix timestamp or DateTime object. If you provide a DateTime
-object, remember to set the correct time zone.
-
-=back
+No arguments.
 
 Return value:
 

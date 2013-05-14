@@ -6,6 +6,9 @@ MANIFEST.SKIP
 META.json
 META.yml
 README
+bin/count-done-org-todos
+bin/count-org-todos
+bin/count-undone-org-todos
 bin/dump-org-structure
 bin/list-org-anniversaries
 bin/list-org-headlines

@@ -17,7 +17,7 @@ my %module_build_args = (
     "Steven Haryanto <stevenharyanto\@gmail.com>"
   ],
   "dist_name" => "App-OrgUtils",
-  "dist_version" => "0.16",
+  "dist_version" => "0.17",
   "license" => "perl",
   "module_name" => "App::OrgUtils",
   "recommends" => {},
@@ -31,13 +31,16 @@ my %module_build_args = (
     "Org::Dump" => 0,
     "Org::Parser" => "0.26",
     "Perinci::CmdLine" => "0.56",
-    "perl" => "5.010000"
+    "perl" => "5.010001"
   },
   "script_files" => [
-    "bin/list-org-todos",
     "bin/dump-org-structure",
+    "bin/list-org-todos",
+    "bin/list-org-anniversaries",
     "bin/list-org-headlines",
-    "bin/list-org-anniversaries"
+    "bin/count-done-org-todos",
+    "bin/count-org-todos",
+    "bin/count-undone-org-todos"
   ]
 );
 

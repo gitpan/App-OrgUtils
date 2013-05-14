@@ -2,7 +2,7 @@ NAME
     App::OrgUtils - Some utilities for Org documents
 
 VERSION
-    version 0.16
+    version 0.17
 
 DESCRIPTION
     This distribution includes a few modules (scripts) for dealing with Org
@@ -10,12 +10,6 @@ DESCRIPTION
 
 SEE ALSO
     Org::Parser
-
-DESCRIPTION
-    This module has Rinci metadata.
-
-FUNCTIONS
-    None are exported by default, but they are exportable.
 
 AUTHOR
     Steven Haryanto <stevenharyanto@gmail.com>
@@ -26,3 +20,4 @@ COPYRIGHT AND LICENSE
     This is free software; you can redistribute it and/or modify it under
     the same terms as the Perl 5 programming language system itself.
 
+FUNCTIONS
