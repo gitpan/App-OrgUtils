@@ -6,7 +6,7 @@ use warnings;
 
 use Org::Parser;
 
-our $VERSION = '0.17'; # VERSION
+our $VERSION = '0.18'; # VERSION
 
 my $org = Org::Parser->new;
 my $doc;
@@ -28,9 +28,11 @@ say $n;
 # ABSTRACT: Count todos which are undone in Org document
 # PODNAME: count-undone-org-todos
 
-
 __END__
+
 =pod
+
+=encoding utf-8
 
 =head1 NAME
 
@@ -38,7 +40,7 @@ count-undone-org-todos - Count todos which are undone in Org document
 
 =head1 VERSION
 
-version 0.17
+version 0.18
 
 =head1 SYNOPSIS
 
@@ -72,4 +74,3 @@ This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.
 
 =cut
-

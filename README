@@ -2,7 +2,7 @@ NAME
     App::OrgUtils - Some utilities for Org documents
 
 VERSION
-    version 0.17
+    version 0.18
 
 DESCRIPTION
     This distribution includes a few modules (scripts) for dealing with Org
@@ -21,3 +21,5 @@ COPYRIGHT AND LICENSE
     the same terms as the Perl 5 programming language system itself.
 
 FUNCTIONS
+    None are exported by default, but they are exportable.
+

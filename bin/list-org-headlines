@@ -6,7 +6,7 @@ use warnings;
 
 use Perinci::CmdLine;
 
-our $VERSION = '0.17'; # VERSION
+our $VERSION = '0.18'; # VERSION
 
 binmode STDOUT, ":utf8";
 Perinci::CmdLine->new(url=>'/App/ListOrgHeadlines/list_org_headlines')->run;
@@ -15,9 +15,11 @@ Perinci::CmdLine->new(url=>'/App/ListOrgHeadlines/list_org_headlines')->run;
 # ABSTRACT: List headlines in Org files
 # PODNAME: list-org-headlines
 
-
 __END__
+
 =pod
+
+=encoding utf-8
 
 =head1 NAME
 
@@ -25,7 +27,7 @@ list-org-headlines - List headlines in Org files
 
 =head1 VERSION
 
-version 0.17
+version 0.18
 
 =head1 SYNOPSIS
 
@@ -68,4 +70,3 @@ This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.
 
 =cut
-

@@ -7,7 +7,7 @@ use Log::Any '$log';
 
 use Org::Parser;
 
-our $VERSION = '0.17'; # VERSION
+our $VERSION = '0.18'; # VERSION
 
 sub _load_org_files_with_cache {
     require Cwd;
@@ -41,8 +41,11 @@ sub _load_org_files_with_cache {
 1;
 #ABSTRACT: Some utilities for Org documents
 
+__END__
 
 =pod
+
+=encoding utf-8
 
 =head1 NAME
 
@@ -50,7 +53,7 @@ App::OrgUtils - Some utilities for Org documents
 
 =head1 VERSION
 
-version 0.17
+version 0.18
 
 =head1 DESCRIPTION
 
@@ -74,8 +77,7 @@ the same terms as the Perl 5 programming language system itself.
 
 =head1 FUNCTIONS
 
+
+None are exported by default, but they are exportable.
+
 =cut
-
-
-__END__
-

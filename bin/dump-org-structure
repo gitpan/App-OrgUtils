@@ -9,7 +9,7 @@ use Log::Any qw($log);
 use Org::Parser;
 use Org::Dump;
 
-our $VERSION = '0.17'; # VERSION
+our $VERSION = '0.18'; # VERSION
 
 my $input = [<>];
 close STDIN; close ARGV; # so perl doesn't add ", <> line xx" upon dying
@@ -21,9 +21,11 @@ print Org::Dump::dump_element($doc);
 # ABSTRACT: Dump Org document structure
 # PODNAME: dump-org-structure
 
-
 __END__
+
 =pod
+
+=encoding utf-8
 
 =head1 NAME
 
@@ -31,7 +33,7 @@ dump-org-structure - Dump Org document structure
 
 =head1 VERSION
 
-version 0.17
+version 0.18
 
 =head1 SYNOPSIS
 
@@ -41,8 +43,8 @@ version 0.17
 Given an Org document like this:
 
  * Andi Angkasa
- - email      :: andi@example.com
- - birthday   :: [1981-03-31 ]
+ - email :: andi@example.com
+ - birthday :: [1981-03-31 ]
 
 will output something like:
 
@@ -86,4 +88,3 @@ This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.
 
 =cut
-
