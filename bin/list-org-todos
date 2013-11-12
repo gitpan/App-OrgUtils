@@ -6,7 +6,7 @@ use warnings;
 
 use Perinci::CmdLine;
 
-our $VERSION = '0.18'; # VERSION
+our $VERSION = '0.19'; # VERSION
 
 binmode STDOUT, ":utf8";
 Perinci::CmdLine->new(url => '/App/ListOrgTodos/list_org_todos')->run;
@@ -19,7 +19,7 @@ __END__
 
 =pod
 
-=encoding utf-8
+=encoding UTF-8
 
 =head1 NAME
 
@@ -27,7 +27,7 @@ list-org-todos - List todo items in Org files
 
 =head1 VERSION
 
-version 0.18
+version 0.19
 
 =head1 SYNOPSIS
 
@@ -52,6 +52,22 @@ demo for L<Org::Parser>.
 
 B<list-org-headlines>, a slightly more general version. This script is basically
 equivalent to "list-org-headlines --todo ...".
+
+=head1 HOMEPAGE
+
+Please visit the project's homepage at L<https://metacpan.org/release/App-OrgUtils>.
+
+=head1 SOURCE
+
+Source repository is at L<https://github.com/sharyanto/perl-App-OrgUtils>.
+
+=head1 BUGS
+
+Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=App-OrgUtils>
+
+When submitting a bug or request, please include a test-file or a
+patch to an existing test-file that illustrates the bug or desired
+feature.
 
 =head1 AUTHOR
 

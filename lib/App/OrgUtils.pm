@@ -7,7 +7,7 @@ use Log::Any '$log';
 
 use Org::Parser;
 
-our $VERSION = '0.18'; # VERSION
+our $VERSION = '0.19'; # VERSION
 
 sub _load_org_files_with_cache {
     require Cwd;
@@ -45,7 +45,7 @@ __END__
 
 =pod
 
-=encoding utf-8
+=encoding UTF-8
 
 =head1 NAME
 
@@ -53,16 +53,37 @@ App::OrgUtils - Some utilities for Org documents
 
 =head1 VERSION
 
-version 0.18
+version 0.19
 
 =head1 DESCRIPTION
 
 This distribution includes a few modules (scripts) for dealing with Org
 documents; some originally created as examples/demos for L<Org::Parser>.
 
+=head1 FUNCTIONS
+
+
+None are exported by default, but they are exportable.
+
 =head1 SEE ALSO
 
 L<Org::Parser>
+
+=head1 HOMEPAGE
+
+Please visit the project's homepage at L<https://metacpan.org/release/App-OrgUtils>.
+
+=head1 SOURCE
+
+Source repository is at L<https://github.com/sharyanto/perl-App-OrgUtils>.
+
+=head1 BUGS
+
+Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=App-OrgUtils>
+
+When submitting a bug or request, please include a test-file or a
+patch to an existing test-file that illustrates the bug or desired
+feature.
 
 =head1 AUTHOR
 
@@ -74,10 +95,5 @@ This software is copyright (c) 2013 by Steven Haryanto.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.
-
-=head1 FUNCTIONS
-
-
-None are exported by default, but they are exportable.
 
 =cut

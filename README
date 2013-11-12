@@ -2,14 +2,32 @@ NAME
     App::OrgUtils - Some utilities for Org documents
 
 VERSION
-    version 0.18
+    version 0.19
 
 DESCRIPTION
     This distribution includes a few modules (scripts) for dealing with Org
     documents; some originally created as examples/demos for Org::Parser.
 
+FUNCTIONS
+    None are exported by default, but they are exportable.
+
 SEE ALSO
     Org::Parser
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/App-OrgUtils>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/sharyanto/perl-App-OrgUtils>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=App-OrgUtils>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
 
 AUTHOR
     Steven Haryanto <stevenharyanto@gmail.com>
@@ -19,7 +37,4 @@ COPYRIGHT AND LICENSE
 
     This is free software; you can redistribute it and/or modify it under
     the same terms as the Perl 5 programming language system itself.
-
-FUNCTIONS
-    None are exported by default, but they are exportable.
 

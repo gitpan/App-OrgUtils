@@ -38,11 +38,12 @@ my %WriteMakefileArgs = (
     "Perinci::CmdLine" => "0.56"
   },
   "TEST_REQUIRES" => {
+    "File::Spec" => 0,
     "IO::Handle" => 0,
     "IPC::Open3" => 0,
     "Test::More" => 0
   },
-  "VERSION" => "0.18",
+  "VERSION" => "0.19",
   "test" => {
     "TESTS" => "t/*.t"
   }
