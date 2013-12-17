@@ -2,14 +2,11 @@ NAME
     App::OrgUtils - Some utilities for Org documents
 
 VERSION
-    version 0.19
+    version 0.20
 
 DESCRIPTION
     This distribution includes a few modules (scripts) for dealing with Org
     documents; some originally created as examples/demos for Org::Parser.
-
-FUNCTIONS
-    None are exported by default, but they are exportable.
 
 SEE ALSO
     Org::Parser

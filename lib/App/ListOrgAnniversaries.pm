@@ -3,6 +3,7 @@ package App::ListOrgAnniversaries;
 use 5.010;
 use strict;
 use warnings;
+use experimental 'smartmatch';
 use Log::Any qw($log);
 
 use App::OrgUtils;
@@ -16,7 +17,7 @@ require Exporter;
 our @ISA       = qw(Exporter);
 our @EXPORT_OK = qw(list_org_anniversaries);
 
-our $VERSION = '0.19'; # VERSION
+our $VERSION = '0.20'; # VERSION
 
 our %SPEC;
 
@@ -296,7 +297,7 @@ App::ListOrgAnniversaries - List headlines in Org files
 
 =head1 VERSION
 
-version 0.19
+version 0.20
 
 =head1 SYNOPSIS
 
@@ -311,9 +312,9 @@ This module uses L<Log::Any> logging framework.
 None are exported, but they are exportable.
 
 
-None are exported by default, but they are exportable.
-
 =head2 list_org_anniversaries(%args) -> [status, msg, result, meta]
+
+List all anniversaries in Org files.
 
 This function expects contacts in the following format:
 

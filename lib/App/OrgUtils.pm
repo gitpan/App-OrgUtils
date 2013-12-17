@@ -7,7 +7,7 @@ use Log::Any '$log';
 
 use Org::Parser;
 
-our $VERSION = '0.19'; # VERSION
+our $VERSION = '0.20'; # VERSION
 
 sub _load_org_files_with_cache {
     require Cwd;
@@ -53,17 +53,12 @@ App::OrgUtils - Some utilities for Org documents
 
 =head1 VERSION
 
-version 0.19
+version 0.20
 
 =head1 DESCRIPTION
 
 This distribution includes a few modules (scripts) for dealing with Org
 documents; some originally created as examples/demos for L<Org::Parser>.
-
-=head1 FUNCTIONS
-
-
-None are exported by default, but they are exportable.
 
 =head1 SEE ALSO
 

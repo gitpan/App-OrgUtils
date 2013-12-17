@@ -3,6 +3,7 @@ package App::ListOrgHeadlines;
 use 5.010001;
 use strict;
 use warnings;
+use experimental 'smartmatch';
 use Log::Any qw($log);
 
 use App::OrgUtils;
@@ -16,7 +17,7 @@ require Exporter;
 our @ISA       = qw(Exporter);
 our @EXPORT_OK = qw(list_org_headlines);
 
-our $VERSION = '0.19'; # VERSION
+our $VERSION = '0.20'; # VERSION
 
 our %SPEC;
 
@@ -334,7 +335,7 @@ sub list_org_headlines {
     if ($args{group_by_tags}) {
         # cache tags in each @res element's [3] element
         for (@res) { $_->[3] = [$_->[2]->get_tags] }
-        my @tags = sort uniq map {@{$_->[3]}} @res;
+        my @tags = sort(uniq(map {@{$_->[3]}} @res));
         $res = {};
         for my $tag ('', @tags) {
             $res->{$tag} = [];
@@ -372,7 +373,7 @@ App::ListOrgHeadlines - List headlines in Org files
 
 =head1 VERSION
 
-version 0.19
+version 0.20
 
 =head1 SYNOPSIS
 
@@ -385,9 +386,9 @@ version 0.19
 None are exported, but they are exportable.
 
 
-None are exported by default, but they are exportable.
-
 =head2 list_org_headlines(%args) -> [status, msg, result, meta]
+
+List all headlines in all Org files.
 
 Arguments ('*' denotes required arguments):
 

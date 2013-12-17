@@ -6,7 +6,7 @@ use warnings;
 
 use Org::Parser;
 
-our $VERSION = '0.19'; # VERSION
+our $VERSION = '0.20'; # VERSION
 
 my $org = Org::Parser->new;
 my $doc;
@@ -39,7 +39,7 @@ count-org-todos - Count todos in Org document
 
 =head1 VERSION
 
-version 0.19
+version 0.20
 
 =head1 SYNOPSIS
 
