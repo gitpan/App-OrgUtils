@@ -11,13 +11,12 @@ use Cwd qw(abs_path);
 use DateTime;
 use Digest::MD5 qw(md5_hex);
 use Lingua::EN::Numbers::Ordinate;
-use Scalar::Util qw(reftype);
 
 require Exporter;
 our @ISA       = qw(Exporter);
 our @EXPORT_OK = qw(list_org_anniversaries);
 
-our $VERSION = '0.20'; # VERSION
+our $VERSION = '0.21'; # VERSION
 
 our %SPEC;
 
@@ -119,6 +118,7 @@ sub _process_hl {
 }
 
 $SPEC{list_org_anniversaries} = {
+    v => 1.1,
     summary => 'List all anniversaries in Org files',
     description => <<'_',
 This function expects contacts in the following format:
@@ -151,65 +151,76 @@ startup script).
 
 _
     args    => {
-        files => ['array*' => {
-            of         => 'str*',
-            arg_pos    => 0,
-            arg_greedy => 1,
-        }],
-        cache_dir => ['str*' => {
+        files => {
+            schema  => ['array*' => {of => 'str*', min_len=>1}],
+            req     => 1,
+            pos     => 0,
+            greedy  => 1,
+        },
+        cache_dir => {
             summary => 'Cache Org parse result',
+            schema  => ['str*'],
             description => <<'_',
 
 Since Org::Parser can spend some time to parse largish Org files, this is an
 option to store the parse result. Caching is turned on if this argument is set.
 
 _
-        }],
-        field_pattern => [str => {
+        },
+        field_pattern => {
             summary => 'Field regex that specifies anniversaries',
-            default => '(?:birthday|anniversary)'
-        }],
-        has_tags => [array => {
+            schema  => [str => {
+                default => '(?:birthday|anniversary)',
+            }],
+        },
+        has_tags => {
             summary => 'Filter headlines that have the specified tags',
-        }],
-        lacks_tags => [array => {
+            schema  => [array => {of => 'str*'}],
+        },
+        lacks_tags => {
             summary => 'Filter headlines that don\'t have the specified tags',
-        }],
-        due_in => [int => {
+            schema  => [array => {of => 'str*'}],
+        },
+        due_in => {
             summary => 'Only show anniversaries that are due '.
                 'in this number of days',
-        }],
-        max_overdue => [int => {
+            schema  => ['int'],
+        },
+        max_overdue => {
             summary => 'Don\'t show dates that are overdue '.
                 'more than this number of days',
-        }],
-        time_zone => [str => {
+            schema  => ['int'],
+        },
+        time_zone => {
             summary => 'Will be passed to parser\'s options',
+            schema  => ['str'],
             description => <<'_',
 
 If not set, TZ environment variable will be picked as default.
 
 _
-        }],
-        today => [any => {
-            # disable temporarily due to Data::Sah broken - 2012-12-25
-            #of => ['int', [obj => {isa=>'DateTime'}]],
+        },
+        today => {
             summary => 'Assume today\'s date',
+            schema  => [any => {
+                of => ['int', [obj => {isa=>'DateTime'}]],
+            }],
             description => <<'_',
 
 You can provide Unix timestamp or DateTime object. If you provide a DateTime
 object, remember to set the correct time zone.
 
 _
-        }],
-        sort => [any => {
-            # disable temporarily due to Data::Sah broken - 2012-12-25
-            #of => [
-            #    ['str*' => {in=>['due_date', '-due_date']}],
-            #    'code*'
-            #],
-            default => 'due_date',
+        },
+        sort => {
             summary => 'Specify sorting',
+            schema  => [any => {
+                of => [
+                    ['str*' => {in=>['due_date', '-due_date']}],
+                    'code*',
+                ],
+                default => 'due_date',
+            }],
             description => <<'_',
 
 If string, must be one of 'date', '-date' (descending).
@@ -219,22 +230,18 @@ REC is the final record that will be returned as final result (can be a string
 or a hash, if 'detail' is enabled), and DUE_DATE is the DateTime object.
 
 _
-        }],
-   },
+        },
+    },
 };
-sub list_org_anniversaries {
+{ my $meta = $App::ListOrgAnniversaries::SPEC{list_org_anniversaries}; $meta->{'x.perinci.sub.wrapper.log'} = [{'validate_args' => 1,'embed' => 1,'normalize_schema' => 1,'validate_result' => 1}]; $meta->{args}{'cache_dir'}{schema} = ['str',{'req' => 1},{}]; $meta->{args}{'due_in'}{schema} = ['int',{},{}]; $meta->{args}{'field_pattern'}{schema} = ['str',{'default' => '(?:birthday|anniversary)'},{}]; $meta->{args}{'files'}{schema} = ['array',{'req' => 1,'of' => 'str*','min_len' => 1},{}]; $meta->{args}{'has_tags'}{schema} = ['array',{'of' => 'str*'},{}]; $meta->{args}{'lacks_tags'}{schema} = ['array',{'of' => 'str*'},{}]; $meta->{args}{'max_overdue'}{schema} = ['int',{},{}]; $meta->{args}{'sort'}{schema} = ['any',{'of' => [['str*',{'in' => ['due_date','-due_date']}],'code*'],'default' => 'due_date'},{}]; $meta->{args}{'time_zone'}{schema} = ['str',{},{}]; $meta->{args}{'today'}{schema} = ['any',{'of' => ['int',['obj',{'isa' => 'DateTime'}]]},{}]; } sub list_org_anniversaries {
     my %args = @_;
-    my $sort = $args{sort} // 'due_date';
-
-    my $tz = $args{time_zone} // $ENV{TZ} // "UTC";
-
-    # XXX schema
+ my $_sahv_dpath = []; my $_w_res = undef; for (sort keys %args) { if (!/\A(-?)\w+(\.\w+)*\z/o) { return [400, "Invalid argument name '$_'"]; } if (!($1 || $_ ~~ ['cache_dir','due_in','field_pattern','files','has_tags','lacks_tags','max_overdue','sort','time_zone','today'])) { return [400, "Unknown argument '$_'"]; } } if (exists($args{'cache_dir'})) { my $err_cache_dir; ((defined($args{'cache_dir'})) ? 1 : (($err_cache_dir //= (@$_sahv_dpath ? '@'.join("/",@$_sahv_dpath).": " : "") . "Required input not specified"),0)) && ((!ref($args{'cache_dir'})) ? 1 : (($err_cache_dir //= (@$_sahv_dpath ? '@'.join("/",@$_sahv_dpath).": " : "") . "Input is not of type text"),0)); if ($err_cache_dir) { return [400, "Invalid value for argument 'cache_dir': $err_cache_dir"]; } } if (exists($args{'due_in'})) { my $err_due_in; (!defined($args{'due_in'}) ? 1 :  ((Scalar::Util::looks_like_number($args{'due_in'}) =~ /^(?:1|2|9|10|4352)$/) ? 1 : (($err_due_in //= (@$_sahv_dpath ? '@'.join("/",@$_sahv_dpath).": " : "") . "Input is not of type integer"),0))); if ($err_due_in) { return [400, "Invalid value for argument 'due_in': $err_due_in"]; } } if (exists($args{'field_pattern'})) { my $err_field_pattern; ($args{'field_pattern'} //= "(?:birthday|anniversary)", 1) && (!defined($args{'field_pattern'}) ? 1 :  ((!ref($args{'field_pattern'})) ? 1 : (($err_field_pattern //= (@$_sahv_dpath ? '@'.join("/",@$_sahv_dpath).": " : "") . "Input is not of type text"),0))); if ($err_field_pattern) { return [400, "Invalid value for argument 'field_pattern': $err_field_pattern"]; } } else { $args{'field_pattern'} //= '(?:birthday|anniversary)'; } if (exists($args{'files'})) { my $err_files; ((defined($args{'files'})) ? 1 : (($err_files //= (@$_sahv_dpath ? '@'.join("/",@$_sahv_dpath).": " : "") . "Required input not specified"),0)) && ((ref($args{'files'}) eq 'ARRAY') ? 1 : (($err_files //= (@$_sahv_dpath ? '@'.join("/",@$_sahv_dpath).": " : "") . "Input is not of type array"),0)) && ((@{$args{'files'}} >= 1) ? 1 : (($err_files //= (@$_sahv_dpath ? '@'.join("/",@$_sahv_dpath).": " : "") . "Length must be at least 1"),0)) && ((push(@$_sahv_dpath, undef), (!defined(List::Util::first(sub {!( ($_sahv_dpath->[-1] = defined($_sahv_dpath->[-1]) ? $_sahv_dpath->[-1]+1 : 0), ((defined($_)) ? 1 : (($err_files //= (@$_sahv_dpath ? '@'.join("/",@$_sahv_dpath).": " : "") . "Required input not specified"),0)) && ((!ref($_)) ? 1 : (($err_files //= (@$_sahv_dpath ? '@'.join("/",@$_sahv_dpath).": " : "") . "Input is not of type text"),0)) )}, @{$args{'files'}})))) ? 1 : (($err_files //= (@$_sahv_dpath ? '@'.join("/",@$_sahv_dpath).": " : "") . "Input is not of type text", pop(@$_sahv_dpath)),0)); if ($err_files) { return [400, "Invalid value for argument 'files': $err_files"]; } } if (!exists($args{'files'})) { return [400, "Missing required argument: files"]; } if (exists($args{'has_tags'})) { my $err_has_tags; (!defined($args{'has_tags'}) ? 1 :  ((ref($args{'has_tags'}) eq 'ARRAY') ? 1 : (($err_has_tags //= (@$_sahv_dpath ? '@'.join("/",@$_sahv_dpath).": " : "") . "Input is not of type array"),0)) && ((push(@$_sahv_dpath, undef), (!defined(List::Util::first(sub {!( ($_sahv_dpath->[-1] = defined($_sahv_dpath->[-1]) ? $_sahv_dpath->[-1]+1 : 0), ((defined($_)) ? 1 : (($err_has_tags //= (@$_sahv_dpath ? '@'.join("/",@$_sahv_dpath).": " : "") . "Required input not specified"),0)) && ((!ref($_)) ? 1 : (($err_has_tags //= (@$_sahv_dpath ? '@'.join("/",@$_sahv_dpath).": " : "") . "Input is not of type text"),0)) )}, @{$args{'has_tags'}})))) ? 1 : (($err_has_tags //= (@$_sahv_dpath ? '@'.join("/",@$_sahv_dpath).": " : "") . "Input is not of type text", pop(@$_sahv_dpath)),0))); if ($err_has_tags) { return [400, "Invalid value for argument 'has_tags': $err_has_tags"]; } } if (exists($args{'lacks_tags'})) { my $err_lacks_tags; (!defined($args{'lacks_tags'}) ? 1 :  ((ref($args{'lacks_tags'}) eq 'ARRAY') ? 1 : (($err_lacks_tags //= (@$_sahv_dpath ? '@'.join("/",@$_sahv_dpath).": " : "") . "Input is not of type array"),0)) && ((push(@$_sahv_dpath, undef), (!defined(List::Util::first(sub {!( ($_sahv_dpath->[-1] = defined($_sahv_dpath->[-1]) ? $_sahv_dpath->[-1]+1 : 0), ((defined($_)) ? 1 : (($err_lacks_tags //= (@$_sahv_dpath ? '@'.join("/",@$_sahv_dpath).": " : "") . "Required input not specified"),0)) && ((!ref($_)) ? 1 : (($err_lacks_tags //= (@$_sahv_dpath ? '@'.join("/",@$_sahv_dpath).": " : "") . "Input is not of type text"),0)) )}, @{$args{'lacks_tags'}})))) ? 1 : (($err_lacks_tags //= (@$_sahv_dpath ? '@'.join("/",@$_sahv_dpath).": " : "") . "Input is not of type text", pop(@$_sahv_dpath)),0))); if ($err_lacks_tags) { return [400, "Invalid value for argument 'lacks_tags': $err_lacks_tags"]; } } if (exists($args{'max_overdue'})) { my $err_max_overdue; (!defined($args{'max_overdue'}) ? 1 :  ((Scalar::Util::looks_like_number($args{'max_overdue'}) =~ /^(?:1|2|9|10|4352)$/) ? 1 : (($err_max_overdue //= (@$_sahv_dpath ? '@'.join("/",@$_sahv_dpath).": " : "") . "Input is not of type integer"),0))); if ($err_max_overdue) { return [400, "Invalid value for argument 'max_overdue': $err_max_overdue"]; } } if (exists($args{'sort'})) { my $err_sort; ($args{'sort'} //= "due_date", 1) && (!defined($args{'sort'}) ? 1 :  ((1) ? 1 : (($err_sort //= (@$_sahv_dpath ? '@'.join("/",@$_sahv_dpath).": " : "") . "Input is not of type any"),0)) && (((do { my $_sahv_ok = 0; my $_sahv_nok = 0; (                ((defined($args{'sort'})) ? 1 : (($err_sort //= (@$_sahv_dpath ? '@'.join("/",@$_sahv_dpath).": " : "") . "Required input not specified"),0)) && ((!ref($args{'sort'})) ? 1 : (($err_sort //= (@$_sahv_dpath ? '@'.join("/",@$_sahv_dpath).": " : "") . "Input is not of type text"),0)) && (($args{'sort'} ~~ ["due_date","-due_date"]) ? 1 : (($err_sort //= (@$_sahv_dpath ? '@'.join("/",@$_sahv_dpath).": " : "") . "Must be one of [\"due_date\",\"-due_date\"]"),0)) ? ++$_sahv_ok : ++$_sahv_nok) && (                ((defined($args{'sort'})) ? 1 : (($err_sort //= (@$_sahv_dpath ? '@'.join("/",@$_sahv_dpath).": " : "") . "Required input not specified"),0)) && ((ref($args{'sort'}) eq 'CODE') ? 1 : (($err_sort //= (@$_sahv_dpath ? '@'.join("/",@$_sahv_dpath).": " : "") . "Input is not of type code"),0)) ? ++$_sahv_ok : ++$_sahv_nok) && $_sahv_ok >= 1 && ($err_sort = undef, 1)}) ? 1 : (($err_sort //= (@$_sahv_dpath ? '@'.join("/",@$_sahv_dpath).": " : "") . "Input does not satisfy the following schema: must be one of the following: (text, must be one of [\"due_date\",\"-due_date\"]), code"),0)) ? 1 : (($err_sort //= (@$_sahv_dpath ? '@'.join("/",@$_sahv_dpath).": " : "") . "Input does not satisfy the following schema: must be one of the following: (text, must be one of [\"due_date\",\"-due_date\"]), code"),0))); if ($err_sort) { return [400, "Invalid value for argument 'sort': $err_sort"]; } } else { $args{'sort'} //= 'due_date'; } if (exists($args{'time_zone'})) { my $err_time_zone; (!defined($args{'time_zone'}) ? 1 :  ((!ref($args{'time_zone'})) ? 1 : (($err_time_zone //= (@$_sahv_dpath ? '@'.join("/",@$_sahv_dpath).": " : "") . "Input is not of type text"),0))); if ($err_time_zone) { return [400, "Invalid value for argument 'time_zone': $err_time_zone"]; } } if (exists($args{'today'})) { my $err_today; (!defined($args{'today'}) ? 1 :  ((1) ? 1 : (($err_today //= (@$_sahv_dpath ? '@'.join("/",@$_sahv_dpath).": " : "") . "Input is not of type any"),0)) && (((do { my $_sahv_ok = 0; my $_sahv_nok = 0; (                (!defined($args{'today'}) ? 1 :  ((Scalar::Util::looks_like_number($args{'today'}) =~ /^(?:1|2|9|10|4352)$/) ? 1 : (($err_today //= (@$_sahv_dpath ? '@'.join("/",@$_sahv_dpath).": " : "") . "Input is not of type integer"),0))) ? ++$_sahv_ok : ++$_sahv_nok) && (                (!defined($args{'today'}) ? 1 :  ((Scalar::Util::blessed($args{'today'})) ? 1 : (($err_today //= (@$_sahv_dpath ? '@'.join("/",@$_sahv_dpath).": " : "") . "Input is not of type object"),0)) && (($args{'today'}->isa("DateTime")) ? 1 : (($err_today //= (@$_sahv_dpath ? '@'.join("/",@$_sahv_dpath).": " : "") . "Must be subclass of DateTime"),0))) ? ++$_sahv_ok : ++$_sahv_nok) && $_sahv_ok >= 1 && ($err_today = undef, 1)}) ? 1 : (($err_today //= (@$_sahv_dpath ? '@'.join("/",@$_sahv_dpath).": " : "") . "Input does not satisfy the following schema: must be one of the following: integer, (object, must be subclass of DateTime)"),0)) ? 1 : (($err_today //= (@$_sahv_dpath ? '@'.join("/",@$_sahv_dpath).": " : "") . "Input does not satisfy the following schema: must be one of the following: integer, (object, must be subclass of DateTime)"),0))); if ($err_today) { return [400, "Invalid value for argument 'today': $err_today"]; } }    $_w_res = do {
+    my $sort  = $args{sort};
+    my $tz    = $args{time_zone} // $ENV{TZ} // "UTC";
     my $files = $args{files};
-    return [400, "Please specify files"] if !$files || !@$files;
-    my $f = $args{field_pattern} // '(?:birthday|anniversary)';
+    my $f     = $args{field_pattern};
     return [400, "Invalid field_pattern: $@"] unless eval { $f = qr/$f/i };
     $args{field_pattern} = $f;
-
     if ($args{today}) {
         if (ref($args{today})) {
             $today = $args{today};
@@ -244,6 +251,7 @@ sub list_org_anniversaries {
     } else {
         $today = DateTime->today(time_zone => $tz);
     }
+
     $yest  = $today->clone->add(days => -1);
 
     my $orgp = Org::Parser->new;
@@ -262,7 +270,7 @@ sub list_org_anniversaries {
     }
 
     if ($sort) {
-        if ((reftype($sort)//'') eq 'CODE') {
+        if (ref($sort) eq 'CODE') {
             @res = sort $sort @res;
         } elsif ($sort =~ /^-?due_date$/) {
             @res = sort {
@@ -271,16 +279,12 @@ sub list_org_anniversaries {
                 my $comp = DateTime->compare($dt1, $dt2);
                 ($sort =~ /^-/ ? -1 : 1) * $comp;
             } @res;
-        } else {
-            # XXX should die here because when Sah is ready, invalid values have
-            # been filtered
-            return [400, "Invalid sort argument"];
         }
     }
 
     [200, "OK", [map {$_->[0]} @res],
      {result_format_opts=>{list_max_columns=>1}}];
-}
+};      unless (ref($_w_res) eq "ARRAY" && $_w_res->[0]) { return [500, 'BUG: Sub App::ListOrgAnniversaries::list_org_anniversaries does not produce envelope']; } return $_w_res; }
 
 1;
 #ABSTRACT: List headlines in Org files
@@ -297,7 +301,7 @@ App::ListOrgAnniversaries - List headlines in Org files
 
 =head1 VERSION
 
-version 0.20
+version 0.21
 
 =head1 SYNOPSIS
 
@@ -350,55 +354,323 @@ Arguments ('*' denotes required arguments):
 
 =item * B<cache_dir> => I<str>
 
-Cache Org parse result.
+List all anniversaries in Org files.
 
-Since Org::Parser can spend some time to parse largish Org files, this is an
-option to store the parse result. Caching is turned on if this argument is set.
+This function expects contacts in the following format:
+
+    * First last                              :office:friend:
+      :PROPERTIES:
+      :BIRTHDAY:     1900-06-07
+      :EMAIL:        foo@example.com
+      :OTHERFIELD:   ...
+      :END:
+
+or:
+
+    * Some name                               :office:
+      - birthday   :: [1900-06-07 ]
+      - email      :: foo@example.com
+      - otherfield :: ...
+
+Using PROPERTIES, dates currently must be specified in "YYYY-MM-DD" format.
+Other format will be supported in the future. Using description list, dates can
+be specified using normal Org timestamps (repeaters and warning periods will be
+ignored).
+
+By convention, if year is '1900' it is assumed to mean year is not specified.
+
+By default, all contacts' anniversaries will be listed. You can filter contacts
+using tags ('hasI<tags' and 'lacks>tags' options), or by 'dueI<in' and
+'max>overdue' options (dueI<in=14 and max>overdue=2 is what I commonly use in my
+startup script).
 
 =item * B<due_in> => I<int>
 
-Only show anniversaries that are due in this number of days.
+List all anniversaries in Org files.
+
+This function expects contacts in the following format:
+
+    * First last                              :office:friend:
+      :PROPERTIES:
+      :BIRTHDAY:     1900-06-07
+      :EMAIL:        foo@example.com
+      :OTHERFIELD:   ...
+      :END:
+
+or:
+
+    * Some name                               :office:
+      - birthday   :: [1900-06-07 ]
+      - email      :: foo@example.com
+      - otherfield :: ...
+
+Using PROPERTIES, dates currently must be specified in "YYYY-MM-DD" format.
+Other format will be supported in the future. Using description list, dates can
+be specified using normal Org timestamps (repeaters and warning periods will be
+ignored).
+
+By convention, if year is '1900' it is assumed to mean year is not specified.
+
+By default, all contacts' anniversaries will be listed. You can filter contacts
+using tags ('hasI<tags' and 'lacks>tags' options), or by 'dueI<in' and
+'max>overdue' options (dueI<in=14 and max>overdue=2 is what I commonly use in my
+startup script).
 
 =item * B<field_pattern> => I<str> (default: "(?:birthday|anniversary)")
 
-Field regex that specifies anniversaries.
+List all anniversaries in Org files.
 
-=item * B<files> => I<array>
+This function expects contacts in the following format:
+
+    * First last                              :office:friend:
+      :PROPERTIES:
+      :BIRTHDAY:     1900-06-07
+      :EMAIL:        foo@example.com
+      :OTHERFIELD:   ...
+      :END:
+
+or:
+
+    * Some name                               :office:
+      - birthday   :: [1900-06-07 ]
+      - email      :: foo@example.com
+      - otherfield :: ...
+
+Using PROPERTIES, dates currently must be specified in "YYYY-MM-DD" format.
+Other format will be supported in the future. Using description list, dates can
+be specified using normal Org timestamps (repeaters and warning periods will be
+ignored).
+
+By convention, if year is '1900' it is assumed to mean year is not specified.
+
+By default, all contacts' anniversaries will be listed. You can filter contacts
+using tags ('hasI<tags' and 'lacks>tags' options), or by 'dueI<in' and
+'max>overdue' options (dueI<in=14 and max>overdue=2 is what I commonly use in my
+startup script).
+
+=item * B<files>* => I<array>
+
+List all anniversaries in Org files.
+
+This function expects contacts in the following format:
+
+    * First last                              :office:friend:
+      :PROPERTIES:
+      :BIRTHDAY:     1900-06-07
+      :EMAIL:        foo@example.com
+      :OTHERFIELD:   ...
+      :END:
+
+or:
+
+    * Some name                               :office:
+      - birthday   :: [1900-06-07 ]
+      - email      :: foo@example.com
+      - otherfield :: ...
+
+Using PROPERTIES, dates currently must be specified in "YYYY-MM-DD" format.
+Other format will be supported in the future. Using description list, dates can
+be specified using normal Org timestamps (repeaters and warning periods will be
+ignored).
+
+By convention, if year is '1900' it is assumed to mean year is not specified.
+
+By default, all contacts' anniversaries will be listed. You can filter contacts
+using tags ('hasI<tags' and 'lacks>tags' options), or by 'dueI<in' and
+'max>overdue' options (dueI<in=14 and max>overdue=2 is what I commonly use in my
+startup script).
 
 =item * B<has_tags> => I<array>
 
-Filter headlines that have the specified tags.
+List all anniversaries in Org files.
+
+This function expects contacts in the following format:
+
+    * First last                              :office:friend:
+      :PROPERTIES:
+      :BIRTHDAY:     1900-06-07
+      :EMAIL:        foo@example.com
+      :OTHERFIELD:   ...
+      :END:
+
+or:
+
+    * Some name                               :office:
+      - birthday   :: [1900-06-07 ]
+      - email      :: foo@example.com
+      - otherfield :: ...
+
+Using PROPERTIES, dates currently must be specified in "YYYY-MM-DD" format.
+Other format will be supported in the future. Using description list, dates can
+be specified using normal Org timestamps (repeaters and warning periods will be
+ignored).
+
+By convention, if year is '1900' it is assumed to mean year is not specified.
+
+By default, all contacts' anniversaries will be listed. You can filter contacts
+using tags ('hasI<tags' and 'lacks>tags' options), or by 'dueI<in' and
+'max>overdue' options (dueI<in=14 and max>overdue=2 is what I commonly use in my
+startup script).
 
 =item * B<lacks_tags> => I<array>
 
-Filter headlines that don't have the specified tags.
+List all anniversaries in Org files.
+
+This function expects contacts in the following format:
+
+    * First last                              :office:friend:
+      :PROPERTIES:
+      :BIRTHDAY:     1900-06-07
+      :EMAIL:        foo@example.com
+      :OTHERFIELD:   ...
+      :END:
+
+or:
+
+    * Some name                               :office:
+      - birthday   :: [1900-06-07 ]
+      - email      :: foo@example.com
+      - otherfield :: ...
+
+Using PROPERTIES, dates currently must be specified in "YYYY-MM-DD" format.
+Other format will be supported in the future. Using description list, dates can
+be specified using normal Org timestamps (repeaters and warning periods will be
+ignored).
+
+By convention, if year is '1900' it is assumed to mean year is not specified.
+
+By default, all contacts' anniversaries will be listed. You can filter contacts
+using tags ('hasI<tags' and 'lacks>tags' options), or by 'dueI<in' and
+'max>overdue' options (dueI<in=14 and max>overdue=2 is what I commonly use in my
+startup script).
 
 =item * B<max_overdue> => I<int>
 
-Don't show dates that are overdue more than this number of days.
+List all anniversaries in Org files.
 
-=item * B<sort> => I<any> (default: "due_date")
+This function expects contacts in the following format:
 
-Specify sorting.
+    * First last                              :office:friend:
+      :PROPERTIES:
+      :BIRTHDAY:     1900-06-07
+      :EMAIL:        foo@example.com
+      :OTHERFIELD:   ...
+      :END:
 
-If string, must be one of 'date', '-date' (descending).
+or:
 
-If code, sorting code will get [REC, DUEI<DATE] as the items to compare, where
-REC is the final record that will be returned as final result (can be a string
-or a hash, if 'detail' is enabled), and DUE>DATE is the DateTime object.
+    * Some name                               :office:
+      - birthday   :: [1900-06-07 ]
+      - email      :: foo@example.com
+      - otherfield :: ...
+
+Using PROPERTIES, dates currently must be specified in "YYYY-MM-DD" format.
+Other format will be supported in the future. Using description list, dates can
+be specified using normal Org timestamps (repeaters and warning periods will be
+ignored).
+
+By convention, if year is '1900' it is assumed to mean year is not specified.
+
+By default, all contacts' anniversaries will be listed. You can filter contacts
+using tags ('hasI<tags' and 'lacks>tags' options), or by 'dueI<in' and
+'max>overdue' options (dueI<in=14 and max>overdue=2 is what I commonly use in my
+startup script).
+
+=item * B<sort> => I<code|str> (default: "due_date")
+
+List all anniversaries in Org files.
+
+This function expects contacts in the following format:
+
+    * First last                              :office:friend:
+      :PROPERTIES:
+      :BIRTHDAY:     1900-06-07
+      :EMAIL:        foo@example.com
+      :OTHERFIELD:   ...
+      :END:
+
+or:
+
+    * Some name                               :office:
+      - birthday   :: [1900-06-07 ]
+      - email      :: foo@example.com
+      - otherfield :: ...
+
+Using PROPERTIES, dates currently must be specified in "YYYY-MM-DD" format.
+Other format will be supported in the future. Using description list, dates can
+be specified using normal Org timestamps (repeaters and warning periods will be
+ignored).
+
+By convention, if year is '1900' it is assumed to mean year is not specified.
+
+By default, all contacts' anniversaries will be listed. You can filter contacts
+using tags ('hasI<tags' and 'lacks>tags' options), or by 'dueI<in' and
+'max>overdue' options (dueI<in=14 and max>overdue=2 is what I commonly use in my
+startup script).
 
 =item * B<time_zone> => I<str>
 
-Will be passed to parser's options.
+List all anniversaries in Org files.
 
-If not set, TZ environment variable will be picked as default.
+This function expects contacts in the following format:
 
-=item * B<today> => I<any>
+    * First last                              :office:friend:
+      :PROPERTIES:
+      :BIRTHDAY:     1900-06-07
+      :EMAIL:        foo@example.com
+      :OTHERFIELD:   ...
+      :END:
 
-Assume today's date.
+or:
 
-You can provide Unix timestamp or DateTime object. If you provide a DateTime
-object, remember to set the correct time zone.
+    * Some name                               :office:
+      - birthday   :: [1900-06-07 ]
+      - email      :: foo@example.com
+      - otherfield :: ...
+
+Using PROPERTIES, dates currently must be specified in "YYYY-MM-DD" format.
+Other format will be supported in the future. Using description list, dates can
+be specified using normal Org timestamps (repeaters and warning periods will be
+ignored).
+
+By convention, if year is '1900' it is assumed to mean year is not specified.
+
+By default, all contacts' anniversaries will be listed. You can filter contacts
+using tags ('hasI<tags' and 'lacks>tags' options), or by 'dueI<in' and
+'max>overdue' options (dueI<in=14 and max>overdue=2 is what I commonly use in my
+startup script).
+
+=item * B<today> => I<int|obj>
+
+List all anniversaries in Org files.
+
+This function expects contacts in the following format:
+
+    * First last                              :office:friend:
+      :PROPERTIES:
+      :BIRTHDAY:     1900-06-07
+      :EMAIL:        foo@example.com
+      :OTHERFIELD:   ...
+      :END:
+
+or:
+
+    * Some name                               :office:
+      - birthday   :: [1900-06-07 ]
+      - email      :: foo@example.com
+      - otherfield :: ...
+
+Using PROPERTIES, dates currently must be specified in "YYYY-MM-DD" format.
+Other format will be supported in the future. Using description list, dates can
+be specified using normal Org timestamps (repeaters and warning periods will be
+ignored).
+
+By convention, if year is '1900' it is assumed to mean year is not specified.
+
+By default, all contacts' anniversaries will be listed. You can filter contacts
+using tags ('hasI<tags' and 'lacks>tags' options), or by 'dueI<in' and
+'max>overdue' options (dueI<in=14 and max>overdue=2 is what I commonly use in my
+startup script).
 
 =back
 
@@ -428,7 +700,7 @@ Steven Haryanto <stevenharyanto@gmail.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2013 by Steven Haryanto.
+This software is copyright (c) 2014 by Steven Haryanto.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.
