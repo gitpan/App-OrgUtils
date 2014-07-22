@@ -1,15 +1,15 @@
-#!/usr/bin/perl
+#!perl
 
 use 5.010;
 use strict;
 use warnings;
 
-use Perinci::CmdLine;
+use Perinci::CmdLine::Any;
 
-our $VERSION = '0.21'; # VERSION
+our $VERSION = '0.22'; # VERSION
 
 binmode STDOUT, ":utf8";
-Perinci::CmdLine->new(url=>'/App/ListOrgHeadlines/list_org_headlines')->run;
+Perinci::CmdLine::Any->new(url=>'/App/ListOrgHeadlines/list_org_headlines')->run;
 
 1;
 # ABSTRACT: List headlines in Org files
@@ -27,7 +27,7 @@ list-org-headlines - List headlines in Org files
 
 =head1 VERSION
 
-version 0.21
+This document describes version 0.22 of list-org-headlines (from Perl distribution App-OrgUtils), released on 2014-07-22.
 
 =head1 SYNOPSIS
 

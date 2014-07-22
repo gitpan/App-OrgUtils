@@ -2,7 +2,8 @@ NAME
     App::OrgUtils - Some utilities for Org documents
 
 VERSION
-    version 0.21
+    This document describes version 0.22 of App::OrgUtils (from Perl
+    distribution App-OrgUtils), released on 2014-07-22.
 
 DESCRIPTION
     This distribution includes a few modules (scripts) for dealing with Org

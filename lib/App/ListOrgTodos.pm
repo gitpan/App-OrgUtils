@@ -6,31 +6,38 @@ use warnings;
 use Log::Any qw($log);
 
 use App::ListOrgHeadlines qw(list_org_headlines);
-use Data::Clone;
+use Perinci::Sub::Util qw(gen_modified_sub);
 
 require Exporter;
 our @ISA       = qw(Exporter);
 our @EXPORT_OK = qw(list_org_todos);
 
-our $VERSION = '0.21'; # VERSION
+our $VERSION = '0.22'; # VERSION
 
 our %SPEC;
 
-my $spec = clone($App::ListOrgHeadlines::SPEC{list_org_headlines});
-$spec->{summary} = "List all todo items in all Org files";
-delete $spec->{args}{todo};
-$spec->{args}{done}{schema}[1]{default} = 0;
-$spec->{args}{sort}{schema}[1]{default} = 'due_date';
-$spec->{"x.dist.zilla.plugin.rinci.wrap.wrap_args"} = {validate_args=>0, validate_result=>0}; # don't bother checking arguments, they will be checked in list_org_headlines()
+gen_modified_sub(
+    output_name => 'list_org_todos',
+    summary     => 'List all todo items in all Org files',
 
-$SPEC{list_org_todos} = $spec;
- { my $meta = $App::ListOrgTodos::SPEC{list_org_todos}; $meta->{'x.perinci.sub.wrapper.log'} = [{'validate_args' => 0,'embed' => 1,'normalize_schema' => 1,'validate_result' => 0}]; $meta->{args}{'cache_dir'}{schema} = ['str',{'req' => 1},{}]; $meta->{args}{'detail'}{schema} = ['bool',{'default' => 0},{}]; $meta->{args}{'done'}{schema} = ['bool',{'default' => 0},{}]; $meta->{args}{'due_in'}{schema} = ['int',{},{}]; $meta->{args}{'files'}{schema} = ['array',{'min_len' => 1,'req' => 1,'of' => 'str*'},{}]; $meta->{args}{'from_level'}{schema} = ['int',{'default' => 1},{}]; $meta->{args}{'group_by_tags'}{schema} = ['bool',{'default' => 0},{}]; $meta->{args}{'has_tags'}{schema} = ['array',{},{}]; $meta->{args}{'lacks_tags'}{schema} = ['array',{},{}]; $meta->{args}{'priority'}{schema} = ['str',{},{}]; $meta->{args}{'sort'}{schema} = ['any',{'of' => [['str*',{'in' => ['due_date','-due_date']}],'code*'],'default' => 'due_date'},{}]; $meta->{args}{'state'}{schema} = ['str',{},{}]; $meta->{args}{'time_zone'}{schema} = ['str',{},{}]; $meta->{args}{'to_level'}{schema} = ['int',{},{}]; $meta->{args}{'today'}{schema} = ['any',{'of' => ['int',['obj',{'isa' => 'DateTime'}]]},{}]; } sub list_org_todos {
-    my %args = @_;
- 
-    $args{done} //= 0;
+    base_name   => 'App::ListOrgHeadlines::list_org_headlines',
+    remove_args => ['todo'],
+    modify_args => {
+        done => sub { my $as = shift; $as->{schema}[1]{default} = 0 },
+        sort => sub { my $as = shift; $as->{schema}[1]{default} = 'due_date' },
+    },
+    modify_meta => sub {
+        my $meta = shift;
+        $meta->{"x.dist.zilla.plugin.rinci.wrap.wrap_args"} = {validate_args=>0, validate_result=>0}; # don't bother checking arguments, they will be checked in list_org_headlines()
+    },
+    output_code => sub {
+        my %args = @_;
 
-    App::ListOrgHeadlines::list_org_headlines(%args, todo=>1);
-}
+        $args{done} //= 0;
+
+        App::ListOrgHeadlines::list_org_headlines(%args, todo=>1);
+    },
+);
 
 1;
 #ABSTRACT: List todo items in Org files
@@ -47,7 +54,7 @@ App::ListOrgTodos - List todo items in Org files
 
 =head1 VERSION
 
-version 0.21
+This document describes version 0.22 of App::ListOrgTodos (from Perl distribution App-OrgUtils), released on 2014-07-22.
 
 =head1 SYNOPSIS
 
@@ -70,69 +77,106 @@ Arguments ('*' denotes required arguments):
 
 =item * B<cache_dir> => I<str>
 
-List all todo items in all Org files.
+Cache Org parse result.
+
+Since Org::Parser can spend some time to parse largish Org files, this is an
+option to store the parse result. Caching is turned on if this argument is set.
 
 =item * B<detail> => I<bool> (default: 0)
 
-List all todo items in all Org files.
+Show details instead of just titles.
 
 =item * B<done> => I<bool> (default: 0)
 
-List all todo items in all Org files.
+Only show todo items that are done.
 
 =item * B<due_in> => I<int>
 
-List all todo items in all Org files.
+Only show todo items that are (nearing|passed) due.
+
+If value is not set, then will use todo item's warning period (or, if todo item
+does not have due date or warning period in its due date, will use the default
+14 days).
+
+If value is set to something smaller than the warning period, the todo item will
+still be considered nearing due when the warning period is passed. For example,
+if today is 2011-06-30 and due_in is set to 7, then todo item with due date
+<2011-07-10 > won't pass the filter (it's still 10 days in the future, larger
+than 7) but <2011-07-10 Sun +1y -14d> will (warning period 14 days is already
+passed by that time).
 
 =item * B<files>* => I<array>
 
-List all todo items in all Org files.
-
 =item * B<from_level> => I<int> (default: 1)
 
-List all todo items in all Org files.
+Only show headlines having this level as the minimum.
 
 =item * B<group_by_tags> => I<bool> (default: 0)
 
-List all todo items in all Org files.
+Whether to group result by tags.
+
+If set to true, instead of returning a list, this function will return a hash of
+lists, keyed by tag: {tag1: [hl1, hl2, ...], tag2: [...]}. Note that some
+headlines might be listed more than once if it has several tags.
 
 =item * B<has_tags> => I<array>
 
-List all todo items in all Org files.
+Only show headlines that have the specified tags.
 
 =item * B<lacks_tags> => I<array>
 
-List all todo items in all Org files.
+Only show headlines that don't have the specified tags.
 
 =item * B<priority> => I<str>
 
-List all todo items in all Org files.
+Only show todo items that have this priority.
 
 =item * B<sort> => I<code|str> (default: "due_date")
 
-List all todo items in all Org files.
+Specify sorting.
+
+If string, must be one of 'due_date', '-due_date' (descending).
+
+If code, sorting code will get [REC, DUE_DATE, HL] as the items to compare,
+where REC is the final record that will be returned as final result (can be a
+string or a hash, if 'detail' is enabled), DUE_DATE is the DateTime object (if
+any), and HL is the Org::Headline object.
 
 =item * B<state> => I<str>
 
-List all todo items in all Org files.
+Only show todo items that have this state.
 
 =item * B<time_zone> => I<str>
 
-List all todo items in all Org files.
+Will be passed to parser's options.
+
+If not set, TZ environment variable will be picked as default.
 
 =item * B<to_level> => I<int>
 
-List all todo items in all Org files.
+Only show headlines having this level as the maximum.
 
 =item * B<today> => I<int|obj>
 
-List all todo items in all Org files.
+Assume today's date.
+
+You can provide Unix timestamp or DateTime object. If you provide a DateTime
+object, remember to set the correct time zone.
 
 =back
 
 Return value:
 
-Returns an enveloped result (an array). First element (status) is an integer containing HTTP status code (200 means OK, 4xx caller error, 5xx function error). Second element (msg) is a string containing error message, or 'OK' if status is 200. Third element (result) is optional, the actual result. Fourth element (meta) is called result metadata and is optional, a hash that contains extra information.
+Returns an enveloped result (an array).
+
+First element (status) is an integer containing HTTP status code
+(200 means OK, 4xx caller error, 5xx function error). Second element
+(msg) is a string containing error message, or 'OK' if status is
+200. Third element (result) is optional, the actual result. Fourth
+element (meta) is called result metadata and is optional, a hash
+that contains extra information.
+
+ (any)
 
 =head1 HOMEPAGE
 

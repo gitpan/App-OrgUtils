@@ -1,15 +1,15 @@
-#!/usr/bin/perl
+#!perl
 
 use 5.010;
 use strict;
 use warnings;
 
-use Perinci::CmdLine;
+use Perinci::CmdLine::Any;
 
-our $VERSION = '0.21'; # VERSION
+our $VERSION = '0.22'; # VERSION
 
 binmode STDOUT, ":utf8";
-Perinci::CmdLine->new(url => '/App/ListOrgTodos/list_org_todos')->run;
+Perinci::CmdLine::Any->new(url => '/App/ListOrgTodos/list_org_todos')->run;
 
 1;
 # ABSTRACT: List todo items in Org files
@@ -27,7 +27,7 @@ list-org-todos - List todo items in Org files
 
 =head1 VERSION
 
-version 0.21
+This document describes version 0.22 of list-org-todos (from Perl distribution App-OrgUtils), released on 2014-07-22.
 
 =head1 SYNOPSIS
 

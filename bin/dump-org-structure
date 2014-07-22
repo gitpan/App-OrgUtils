@@ -1,4 +1,4 @@
-#!/usr/bin/perl
+#!perl
 
 use 5.010;
 use strict;
@@ -9,7 +9,7 @@ use Log::Any qw($log);
 use Org::Parser;
 use Org::Dump;
 
-our $VERSION = '0.21'; # VERSION
+our $VERSION = '0.22'; # VERSION
 
 my $input = [<>];
 close STDIN; close ARGV; # so perl doesn't add ", <> line xx" upon dying
@@ -33,7 +33,7 @@ dump-org-structure - Dump Org document structure
 
 =head1 VERSION
 
-version 0.21
+This document describes version 0.22 of dump-org-structure (from Perl distribution App-OrgUtils), released on 2014-07-22.
 
 =head1 SYNOPSIS
 

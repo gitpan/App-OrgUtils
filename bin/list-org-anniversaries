@@ -1,15 +1,15 @@
-#!/usr/bin/perl
+#!perl
 
 use 5.010;
 use strict;
 use warnings;
 
-our $VERSION = '0.21'; # VERSION
+our $VERSION = '0.22'; # VERSION
 
-use Perinci::CmdLine;
+use Perinci::CmdLine::Any;
 
 binmode STDOUT, ":utf8";
-Perinci::CmdLine->new(
+Perinci::CmdLine::Any->new(
     url => '/App/ListOrgAnniversaries/list_org_anniversaries')->run;
 
 1;
@@ -28,7 +28,7 @@ list-org-anniversaries - List anniversaries in Org files
 
 =head1 VERSION
 
-version 0.21
+This document describes version 0.22 of list-org-anniversaries (from Perl distribution App-OrgUtils), released on 2014-07-22.
 
 =head1 SYNOPSIS
 

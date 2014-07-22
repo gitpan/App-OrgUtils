@@ -7,7 +7,7 @@ use Log::Any '$log';
 
 use Org::Parser;
 
-our $VERSION = '0.21'; # VERSION
+our $VERSION = '0.22'; # VERSION
 
 sub _load_org_files_with_cache {
     require Cwd;
@@ -53,7 +53,7 @@ App::OrgUtils - Some utilities for Org documents
 
 =head1 VERSION
 
-version 0.21
+This document describes version 0.22 of App::OrgUtils (from Perl distribution App-OrgUtils), released on 2014-07-22.
 
 =head1 DESCRIPTION
 
