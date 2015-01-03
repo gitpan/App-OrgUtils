@@ -7,7 +7,7 @@ use Log::Any '$log';
 
 use Org::Parser;
 
-our $VERSION = '0.22'; # VERSION
+our $VERSION = '0.23'; # VERSION
 
 sub _load_org_files_with_cache {
     require Cwd;
@@ -39,7 +39,7 @@ sub _load_org_files_with_cache {
 }
 
 1;
-#ABSTRACT: Some utilities for Org documents
+# ABSTRACT: Some utilities for Org documents
 
 __END__
 
@@ -53,7 +53,7 @@ App::OrgUtils - Some utilities for Org documents
 
 =head1 VERSION
 
-This document describes version 0.22 of App::OrgUtils (from Perl distribution App-OrgUtils), released on 2014-07-22.
+This document describes version 0.23 of App::OrgUtils (from Perl distribution App-OrgUtils), released on 2015-01-03.
 
 =head1 DESCRIPTION
 
@@ -82,11 +82,11 @@ feature.
 
 =head1 AUTHOR
 
-Steven Haryanto <stevenharyanto@gmail.com>
+perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2014 by Steven Haryanto.
+This software is copyright (c) 2015 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

@@ -1,5 +1,8 @@
 package App::ListOrgHeadlines;
 
+our $DATE = '2015-01-03'; # DATE
+our $VERSION = '0.23'; # VERSION
+
 use 5.010001;
 use strict;
 use warnings;
@@ -15,8 +18,6 @@ use List::MoreUtils qw(uniq);
 require Exporter;
 our @ISA       = qw(Exporter);
 our @EXPORT_OK = qw(list_org_headlines);
-
-our $VERSION = '0.22'; # VERSION
 
 our %SPEC;
 
@@ -350,7 +351,7 @@ sub list_org_headlines {
 }
 
 1;
-#ABSTRACT: List headlines in Org files
+# ABSTRACT: List all headlines in all Org files
 
 __END__
 
@@ -360,11 +361,11 @@ __END__
 
 =head1 NAME
 
-App::ListOrgHeadlines - List headlines in Org files
+App::ListOrgHeadlines - List all headlines in all Org files
 
 =head1 VERSION
 
-This document describes version 0.22 of App::ListOrgHeadlines (from Perl distribution App-OrgUtils), released on 2014-07-22.
+This document describes version 0.23 of App::ListOrgHeadlines (from Perl distribution App-OrgUtils), released on 2015-01-03.
 
 =head1 SYNOPSIS
 
@@ -415,7 +416,7 @@ if today is 2011-06-30 and due_in is set to 7, then todo item with due date
 than 7) but <2011-07-10 Sun +1y -14d> will (warning period 14 days is already
 passed by that time).
 
-=item * B<files>* => I<array>
+=item * B<files>* => I<array[str]>
 
 =item * B<from_level> => I<int> (default: 1)
 
@@ -441,7 +442,7 @@ Only show headlines that don't have the specified tags.
 
 Only show todo items that have this priority.
 
-=item * B<sort> => I<code|str> (default: "due_date")
+=item * B<sort> => I<str|code> (default: "due_date")
 
 Specify sorting.
 
@@ -479,8 +480,6 @@ Only show headlines that are todos.
 
 =back
 
-Return value:
-
 Returns an enveloped result (an array).
 
 First element (status) is an integer containing HTTP status code
@@ -490,8 +489,7 @@ First element (status) is an integer containing HTTP status code
 element (meta) is called result metadata and is optional, a hash
 that contains extra information.
 
- (any)
-
+Return value:  (any)
 =head1 HOMEPAGE
 
 Please visit the project's homepage at L<https://metacpan.org/release/App-OrgUtils>.
@@ -510,11 +508,11 @@ feature.
 
 =head1 AUTHOR
 
-Steven Haryanto <stevenharyanto@gmail.com>
+perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2014 by Steven Haryanto.
+This software is copyright (c) 2015 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

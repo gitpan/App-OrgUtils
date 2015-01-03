@@ -1,10 +1,11 @@
 #!perl
 
+our $DATE = '2015-01-03'; # DATE
+our $VERSION = '0.23'; # VERSION
+
 use 5.010;
 use strict;
 use warnings;
-
-our $VERSION = '0.22'; # VERSION
 
 use Perinci::CmdLine::Any;
 
@@ -13,7 +14,7 @@ Perinci::CmdLine::Any->new(
     url => '/App/ListOrgAnniversaries/list_org_anniversaries')->run;
 
 1;
-# ABSTRACT: List anniversaries in Org files
+# ABSTRACT: List all anniversaries in Org files
 # PODNAME: list-org-anniversaries
 
 __END__
@@ -24,11 +25,11 @@ __END__
 
 =head1 NAME
 
-list-org-anniversaries - List anniversaries in Org files
+list-org-anniversaries - List all anniversaries in Org files
 
 =head1 VERSION
 
-This document describes version 0.22 of list-org-anniversaries (from Perl distribution App-OrgUtils), released on 2014-07-22.
+This document describes version 0.23 of list-org-anniversaries (from Perl distribution App-OrgUtils), released on 2015-01-03.
 
 =head1 SYNOPSIS
 
@@ -68,11 +69,219 @@ This script
 
 See L<App::ListOrgAnniversaries> for more details, including available options.
 
+=head1 OPTIONS
+
+C<*> marks required options.
+
+=over
+
+=item B<--cache-dir>=I<s>
+
+Cache Org parse result.
+
+Since Org::Parser can spend some time to parse largish Org files, this is an
+option to store the parse result. Caching is turned on if this argument is set.
+
+
+=item B<--config-path>=I<s>
+
+Set path to configuration file.
+
+Can be specified multiple times.
+
+=item B<--config-profile>=I<s>
+
+Set configuration profile to use.
+
+=item B<--due-in>=I<i>
+
+Only show anniversaries that are due in this number of days.
+
+=item B<--field-pattern>=I<s>
+
+Field regex that specifies anniversaries.
+
+Default value:
+
+ "(?:birthday|anniversary)"
+
+=item B<--files-json>=I<s>
+
+See C<--files>.
+
+=item B<--files-yaml>=I<s>
+
+See C<--files>.
+
+=item B<--files>=I<s@>*
+
+Can be specified multiple times.
+
+=item B<--format-options>=I<s>
+
+Pass options to formatter.
+
+=item B<--format>=I<s>
+
+Choose output format, e.g. json, text.
+
+=item B<--has-tags-json>=I<s>
+
+Filter headlines that have the specified tags (JSON-encoded).
+
+See C<--has-tags>.
+
+=item B<--has-tags-yaml>=I<s>
+
+Filter headlines that have the specified tags (YAML-encoded).
+
+See C<--has-tags>.
+
+=item B<--has-tags>=I<s@>
+
+Filter headlines that have the specified tags.
+
+Can be specified multiple times.
+
+=item B<--help>, B<-h>, B<-?>
+
+Display this help message.
+
+=item B<--json>
+
+Equivalent to --format=json-pretty.
+
+=item B<--lacks-tags-json>=I<s>
+
+Filter headlines that don't have the specified tags (JSON-encoded).
+
+See C<--lacks-tags>.
+
+=item B<--lacks-tags-yaml>=I<s>
+
+Filter headlines that don't have the specified tags (YAML-encoded).
+
+See C<--lacks-tags>.
+
+=item B<--lacks-tags>=I<s@>
+
+Filter headlines that don't have the specified tags.
+
+Can be specified multiple times.
+
+=item B<--max-overdue>=I<i>
+
+Don't show dates that are overdue more than this number of days.
+
+=item B<--no-config>
+
+Do not use any configuration file.
+
+=item B<--perl>
+
+Equivalent to --format=perl.
+
+=item B<--sort-json>=I<s>
+
+Specify sorting (JSON-encoded).
+
+See C<--sort>.
+
+=item B<--sort-yaml>=I<s>
+
+Specify sorting (YAML-encoded).
+
+See C<--sort>.
+
+=item B<--sort>=I<s>
+
+Specify sorting.
+
+Default value:
+
+ "due_date"
+
+If string, must be one of 'date', '-date' (descending).
+
+If code, sorting code will get [REC, DUE_DATE] as the items to compare, where
+REC is the final record that will be returned as final result (can be a string
+or a hash, if 'detail' is enabled), and DUE_DATE is the DateTime object.
+
+
+=item B<--time-zone>=I<s>
+
+Will be passed to parser's options.
+
+If not set, TZ environment variable will be picked as default.
+
+
+=item B<--today-json>=I<s>
+
+Assume today's date (JSON-encoded).
+
+See C<--today>.
+
+=item B<--today-yaml>=I<s>
+
+Assume today's date (YAML-encoded).
+
+See C<--today>.
+
+=item B<--today>=I<s>
+
+Assume today's date.
+
+You can provide Unix timestamp or DateTime object. If you provide a DateTime
+object, remember to set the correct time zone.
+
+
+=item B<--version>, B<-v>
+
+=item B<--yaml>
+
+Equivalent to --format=yaml.
+
+=back
+
+=head1 FILES
+
+B</etc/list-org-anniversaries.conf>
+
+B<~/list-org-anniversaries.conf>
+
 =head1 SEE ALSO
 
 L<Org::Parser>
 
 B<org-contacts>, http://julien.danjou.info/org-contacts.html
+
+=head1 COMPLETION
+
+This script has shell tab completion capability with support for several shells.
+
+=head2 bash
+
+To activate bash completion for this script, put:
+
+ complete -C list-org-anniversaries list-org-anniversaries
+
+in your bash startup (e.g. C<~/.bashrc>). Your next shell session will then recognize tab completion for the command. Or, you can also directly execute the line above in your shell to activate immediately.
+
+It is recommended, however, that you install L<shcompgen> which allows you to activate completion scripts for several kinds of scripts on multiple shells. Some CPAN distributions (those that are built with L<Dist::Zilla::Plugin::GenShellCompletion>) will even automatically enable shell completion for their included scripts (using C<shcompgen>) at installation time, so you can immadiately have tab completion.
+
+=head2 tcsh
+
+To activate tcsh completion for this script, put:
+
+ complete list-org-anniversaries 'p/*/`list-org-anniversaries`/'
+
+in your tcsh startup (e.g. C<~/.tcshrc>). Your next shell session will then recognize tab completion for the command. Or, you can also directly execute the line above in your shell to activate immediately.
+
+It is also recommended to install C<shcompgen> (see above).
+
+=head2 other shells
+
+For fish and zsh, install C<shcompgen> as described above.
 
 =head1 HOMEPAGE
 
@@ -92,11 +301,11 @@ feature.
 
 =head1 AUTHOR
 
-Steven Haryanto <stevenharyanto@gmail.com>
+perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2014 by Steven Haryanto.
+This software is copyright (c) 2015 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

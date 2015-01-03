@@ -2,13 +2,14 @@ use 5.006;
 use strict;
 use warnings;
 
-# this test was generated with Dist::Zilla::Plugin::Test::Compile 2.039
+# this test was generated with Dist::Zilla::Plugin::Test::Compile 2.051
 
-use Test::More  tests => 11 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
+use Test::More;
 
-
+plan tests => 13 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
 
 my @module_files = (
+    'App/FilterOrgByHeadlines.pm',
     'App/ListOrgAnniversaries.pm',
     'App/ListOrgHeadlines.pm',
     'App/ListOrgTodos.pm',
@@ -20,6 +21,7 @@ my @scripts = (
     'bin/count-org-todos',
     'bin/count-undone-org-todos',
     'bin/dump-org-structure',
+    'bin/filter-org-by-headlines',
     'bin/list-org-anniversaries',
     'bin/list-org-headlines',
     'bin/list-org-todos'
@@ -58,9 +60,9 @@ foreach my $file (@scripts)
 { SKIP: {
     open my $fh, '<', $file or warn("Unable to open $file: $!"), next;
     my $line = <$fh>;
-    close $fh and skip("$file isn't perl", 1) unless $line =~ /^#!.*?\bperl\b\s*(.*)$/;
 
-    my @flags = $1 ? split(/\s+/, $1) : ();
+    close $fh and skip("$file isn't perl", 1) unless $line =~ /^#!\s*(?:\S*perl\S*)((?:\s+-\w*)*)(?:\s*#.*)?$/;
+    my @flags = $1 ? split(' ', $1) : ();
 
     my $stderr = IO::Handle->new;
 
@@ -81,6 +83,7 @@ foreach my $file (@scripts)
 
 
 
-is(scalar(@warnings), 0, 'no warnings found') if $ENV{AUTHOR_TESTING};
+is(scalar(@warnings), 0, 'no warnings found')
+    or diag 'got warnings: ', ( Test::More->can('explain') ? Test::More::explain(\@warnings) : join("\n", '', @warnings) ) if $ENV{AUTHOR_TESTING};
 
 

@@ -1,18 +1,19 @@
 #!perl
 
+our $DATE = '2015-01-03'; # DATE
+our $VERSION = '0.23'; # VERSION
+
 use 5.010;
 use strict;
 use warnings;
 
 use Perinci::CmdLine::Any;
 
-our $VERSION = '0.22'; # VERSION
-
 binmode STDOUT, ":utf8";
 Perinci::CmdLine::Any->new(url => '/App/ListOrgTodos/list_org_todos')->run;
 
 1;
-# ABSTRACT: List todo items in Org files
+# ABSTRACT: List all todo items in all Org files
 # PODNAME: list-org-todos
 
 __END__
@@ -23,11 +24,11 @@ __END__
 
 =head1 NAME
 
-list-org-todos - List todo items in Org files
+list-org-todos - List all todo items in all Org files
 
 =head1 VERSION
 
-This document describes version 0.22 of list-org-todos (from Perl distribution App-OrgUtils), released on 2014-07-22.
+This document describes version 0.23 of list-org-todos (from Perl distribution App-OrgUtils), released on 2015-01-03.
 
 =head1 SYNOPSIS
 
@@ -48,10 +49,252 @@ This document describes version 0.22 of list-org-todos (from Perl distribution A
 This is a simple application to list todo items in Org files, first created as a
 demo for L<Org::Parser>.
 
+=head1 OPTIONS
+
+C<*> marks required options.
+
+=over
+
+=item B<--cache-dir>=I<s>
+
+Cache Org parse result.
+
+Since Org::Parser can spend some time to parse largish Org files, this is an
+option to store the parse result. Caching is turned on if this argument is set.
+
+
+=item B<--config-path>=I<s>
+
+Set path to configuration file.
+
+Can be specified multiple times.
+
+=item B<--config-profile>=I<s>
+
+Set configuration profile to use.
+
+=item B<--detail>
+
+Show details instead of just titles.
+
+=item B<--done>
+
+Only show todo items that are done.
+
+=item B<--due-in>=I<i>
+
+Only show todo items that are (nearing|passed) due.
+
+If value is not set, then will use todo item's warning period (or, if todo item
+does not have due date or warning period in its due date, will use the default
+14 days).
+
+If value is set to something smaller than the warning period, the todo item will
+still be considered nearing due when the warning period is passed. For example,
+if today is 2011-06-30 and due_in is set to 7, then todo item with due date
+<2011-07-10 > won't pass the filter (it's still 10 days in the future, larger
+than 7) but <2011-07-10 Sun +1y -14d> will (warning period 14 days is already
+passed by that time).
+
+
+=item B<--files-json>=I<s>
+
+See C<--files>.
+
+=item B<--files-yaml>=I<s>
+
+See C<--files>.
+
+=item B<--files>=I<s@>*
+
+Can be specified multiple times.
+
+=item B<--format-options>=I<s>
+
+Pass options to formatter.
+
+=item B<--format>=I<s>
+
+Choose output format, e.g. json, text.
+
+=item B<--from-level>=I<i>
+
+Only show headlines having this level as the minimum.
+
+Default value:
+
+ 1
+
+=item B<--group-by-tags>
+
+Whether to group result by tags.
+
+If set to true, instead of returning a list, this function will return a hash of
+lists, keyed by tag: {tag1: [hl1, hl2, ...], tag2: [...]}. Note that some
+headlines might be listed more than once if it has several tags.
+
+
+=item B<--has-tags-json>=I<s>
+
+Only show headlines that have the specified tags (JSON-encoded).
+
+See C<--has-tags>.
+
+=item B<--has-tags-yaml>=I<s>
+
+Only show headlines that have the specified tags (YAML-encoded).
+
+See C<--has-tags>.
+
+=item B<--has-tags>=I<s>
+
+Only show headlines that have the specified tags.
+
+=item B<--help>, B<-h>, B<-?>
+
+Display this help message.
+
+=item B<--json>
+
+Equivalent to --format=json-pretty.
+
+=item B<--lacks-tags-json>=I<s>
+
+Only show headlines that don't have the specified tags (JSON-encoded).
+
+See C<--lacks-tags>.
+
+=item B<--lacks-tags-yaml>=I<s>
+
+Only show headlines that don't have the specified tags (YAML-encoded).
+
+See C<--lacks-tags>.
+
+=item B<--lacks-tags>=I<s>
+
+Only show headlines that don't have the specified tags.
+
+=item B<--no-config>
+
+Do not use any configuration file.
+
+=item B<--perl>
+
+Equivalent to --format=perl.
+
+=item B<--priority>=I<s>
+
+Only show todo items that have this priority.
+
+=item B<--sort-json>=I<s>
+
+Specify sorting (JSON-encoded).
+
+See C<--sort>.
+
+=item B<--sort-yaml>=I<s>
+
+Specify sorting (YAML-encoded).
+
+See C<--sort>.
+
+=item B<--sort>=I<s>
+
+Specify sorting.
+
+Default value:
+
+ "due_date"
+
+If string, must be one of 'due_date', '-due_date' (descending).
+
+If code, sorting code will get [REC, DUE_DATE, HL] as the items to compare,
+where REC is the final record that will be returned as final result (can be a
+string or a hash, if 'detail' is enabled), DUE_DATE is the DateTime object (if
+any), and HL is the Org::Headline object.
+
+
+=item B<--state>=I<s>
+
+Only show todo items that have this state.
+
+=item B<--time-zone>=I<s>
+
+Will be passed to parser's options.
+
+If not set, TZ environment variable will be picked as default.
+
+
+=item B<--to-level>=I<i>
+
+Only show headlines having this level as the maximum.
+
+=item B<--today-json>=I<s>
+
+Assume today's date (JSON-encoded).
+
+See C<--today>.
+
+=item B<--today-yaml>=I<s>
+
+Assume today's date (YAML-encoded).
+
+See C<--today>.
+
+=item B<--today>=I<s>
+
+Assume today's date.
+
+You can provide Unix timestamp or DateTime object. If you provide a DateTime
+object, remember to set the correct time zone.
+
+
+=item B<--version>, B<-v>
+
+=item B<--yaml>
+
+Equivalent to --format=yaml.
+
+=back
+
+=head1 FILES
+
+B</etc/list-org-todos.conf>
+
+B<~/list-org-todos.conf>
+
 =head1 SEE ALSO
 
 B<list-org-headlines>, a slightly more general version. This script is basically
 equivalent to "list-org-headlines --todo ...".
+
+=head1 COMPLETION
+
+This script has shell tab completion capability with support for several shells.
+
+=head2 bash
+
+To activate bash completion for this script, put:
+
+ complete -C list-org-todos list-org-todos
+
+in your bash startup (e.g. C<~/.bashrc>). Your next shell session will then recognize tab completion for the command. Or, you can also directly execute the line above in your shell to activate immediately.
+
+It is recommended, however, that you install L<shcompgen> which allows you to activate completion scripts for several kinds of scripts on multiple shells. Some CPAN distributions (those that are built with L<Dist::Zilla::Plugin::GenShellCompletion>) will even automatically enable shell completion for their included scripts (using C<shcompgen>) at installation time, so you can immadiately have tab completion.
+
+=head2 tcsh
+
+To activate tcsh completion for this script, put:
+
+ complete list-org-todos 'p/*/`list-org-todos`/'
+
+in your tcsh startup (e.g. C<~/.tcshrc>). Your next shell session will then recognize tab completion for the command. Or, you can also directly execute the line above in your shell to activate immediately.
+
+It is also recommended to install C<shcompgen> (see above).
+
+=head2 other shells
+
+For fish and zsh, install C<shcompgen> as described above.
 
 =head1 HOMEPAGE
 
@@ -71,11 +314,11 @@ feature.
 
 =head1 AUTHOR
 
-Steven Haryanto <stevenharyanto@gmail.com>
+perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2014 by Steven Haryanto.
+This software is copyright (c) 2015 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.
